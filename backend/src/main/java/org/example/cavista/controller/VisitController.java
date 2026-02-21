@@ -10,13 +10,11 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/visits")
+@RequiredArgsConstructor
 public class VisitController {
 
     private final SubmitVisitService submitVisitService;
 
-    public VisitController(SubmitVisitService submitVisitService) {
-        this.submitVisitService = submitVisitService;
-    }
 
     @PostMapping("/submit")
     public ResponseEntity<SubmitVisitResponse> submitVisit(@Valid @RequestBody SubmitVisitRequest request) {

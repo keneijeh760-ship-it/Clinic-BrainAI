@@ -7,15 +7,13 @@ import org.springframework.stereotype.Service;
  * Uses ClinicalPromptBuilder + AiClientService for bulletproof demo reliability.
  */
 @Service
+@RequiredArgsConstructor
 public class LlmAiSummaryService implements AiSummaryService {
 
     private final ClinicalPromptBuilder promptBuilder;
     private final AiClientService aiClientService;
 
-    public LlmAiSummaryService(ClinicalPromptBuilder promptBuilder, AiClientService aiClientService) {
-        this.promptBuilder = promptBuilder;
-        this.aiClientService = aiClientService;
-    }
+
 
     @Override
     public String generateClinicalSummary(

@@ -13,10 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-/**
- * Submit-visit flow: 12 steps.
- * Controllers talk DTOs. Services talk entities.
- */
+@RequiredArgsConstructor
 @Service
 public class SubmitVisitService {
 
@@ -30,22 +27,6 @@ public class SubmitVisitService {
     private final ChewPointsRepository chewPointsRepository;
     private final TriageService triageService;
     private final AiSummaryService aiSummaryService;
-
-    public SubmitVisitService(UserRepository userRepository,
-                              PatientRepository patientRepository,
-                              VisitRepository visitRepository,
-                              VitalsRepository vitalsRepository,
-                              ChewPointsRepository chewPointsRepository,
-                              TriageService triageService,
-                              AiSummaryService aiSummaryService) {
-        this.userRepository = userRepository;
-        this.patientRepository = patientRepository;
-        this.visitRepository = visitRepository;
-        this.vitalsRepository = vitalsRepository;
-        this.chewPointsRepository = chewPointsRepository;
-        this.triageService = triageService;
-        this.aiSummaryService = aiSummaryService;
-    }
 
     @Transactional
     public SubmitVisitResponse submitVisit(SubmitVisitRequest request) {

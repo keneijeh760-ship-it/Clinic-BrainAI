@@ -13,19 +13,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
+
 public class LeaderboardService {
 
     private final ChewPointsRepository chewPointsRepository;
     private final UserRepository userRepository;
     private final VisitRepository visitRepository;
-
-    public LeaderboardService(ChewPointsRepository chewPointsRepository,
-                              UserRepository userRepository,
-                              VisitRepository visitRepository) {
-        this.chewPointsRepository = chewPointsRepository;
-        this.userRepository = userRepository;
-        this.visitRepository = visitRepository;
-    }
 
     /**
      * List top CHEWs by points for gamification demo.
