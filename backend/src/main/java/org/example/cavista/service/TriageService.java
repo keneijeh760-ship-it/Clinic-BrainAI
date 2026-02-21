@@ -1,13 +1,14 @@
-package org.example.cavista.Services;
+package org.example.cavista.service;
 
 import lombok.RequiredArgsConstructor;
-import org.example.cavista.Entities.RiskLevel;
+
+import org.example.cavista.entity.RiskLevel;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
 public class TriagleService {
-    public RiskLevel getRiskLevel(Integer systolicBp,
+    public RiskLevel computeRiskLevel(Integer systolicBp,
                                   Integer heartRate,
                                   Double temperature,
                                   Integer spo2,
@@ -19,17 +20,17 @@ public class TriagleService {
                 (chiefComplaint != null &&
                         chiefComplaint.toLowerCase().contains("severe"))) {
 
-            return RiskLevel.CRITICAL;
+            return RiskLevel.RED;
         }
 
         if ((temperature != null && temperature >= 37.5) ||
                 (heartRate != null && heartRate > 100)) {
 
-            return RiskLevel.MODERATE;
+            return RiskLevel.YELLOW;
         }
 
 
-        return RiskLevel.GOOD;
+        return RiskLevel.GREEN;
     }
 
 }
