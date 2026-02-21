@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 public class SubmitVisitRequest {
 
     @NotBlank(message = "chewId is required")
-    private String chewId;
+    private Long chewId;
 
     private Long patientId;
 

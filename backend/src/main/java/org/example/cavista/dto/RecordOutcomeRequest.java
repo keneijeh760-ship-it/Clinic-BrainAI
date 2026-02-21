@@ -17,7 +17,7 @@ public class RecordOutcomeRequest {
     private Long visitId;
 
     @NotBlank
-    private String doctorChewId;  // Staff ID of the doctor
+    private Long doctorId;  // Staff ID of the doctor
 
     @NotBlank
     private String decision;  // ADMIT, REFER, DISCHARGE

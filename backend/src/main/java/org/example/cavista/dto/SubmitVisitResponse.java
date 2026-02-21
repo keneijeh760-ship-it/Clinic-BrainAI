@@ -16,4 +16,5 @@ public class SubmitVisitResponse {
     private String aiSummary;
     private Long visitId;
     private int pointsEarned;
+    private String qrCodeBase64;
 }

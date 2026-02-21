@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class LeaderboardEntryDto {
-    private String chewId;
+    private Long chewId;
     private String chewName;
     private int totalPoints;
     private int totalPatientsCaptured;

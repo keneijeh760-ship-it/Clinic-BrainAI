@@ -1,12 +1,13 @@
-package org.example.cavista.Entities;
+package org.example.cavista.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.example.cavista.Patient.PatientEntity;
-import org.example.cavista.User.User;
+
+import org.example.cavista.entity.RiskLevel;
+import org.example.cavista.entity.UserEntity;
 
 import java.time.LocalDateTime;
 
@@ -29,7 +30,7 @@ public class Visit {
     private Long Id;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "chew_Id")
-    private User chew;
+    private UserEntity chew;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "patient_id", nullable = false)

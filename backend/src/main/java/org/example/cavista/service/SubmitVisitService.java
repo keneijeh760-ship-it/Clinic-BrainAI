@@ -1,11 +1,9 @@
 package org.example.cavista.service;
 
+import lombok.RequiredArgsConstructor;
 import org.example.cavista.dto.*;
 import org.example.cavista.entity.*;
-import org.example.cavista.exception.ChewNotFoundException;
-import org.example.cavista.exception.InvalidChewRoleException;
-import org.example.cavista.exception.InvalidVisitRequestException;
-import org.example.cavista.exception.PatientNotFoundException;
+import org.example.cavista.exception.*;
 import org.example.cavista.repository.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,32 +28,37 @@ public class SubmitVisitService {
 
     @Transactional
     public SubmitVisitResponse submitVisit(SubmitVisitRequest request) {
-        // Step 3 — Validate CHEW first
-        UserEntity chew = userRepository.findByChewId(request.getChewId())
-                .orElseThrow(() -> new ChewNotFoundException(request.getChewId()));
+        UserEntity chew = userRepository.findById(request.getChewId())
+                .orElseThrow(() -> new UserNotFoundException(request.getChewId()));
 
         if (chew.getRole() != UserRole.CHEW) {
-            throw new InvalidChewRoleException(request.getChewId());
+            throw new InvalidChewRoleException(
+                    "User is not authorized as CHEW: " + chew.getId()
+            );
         }
-
-        // Step 4 — Resolve patient
         PatientEntity patient;
         boolean isNewPatient;
 
         if (request.getPatientId() != null) {
+
             patient = patientRepository.findById(request.getPatientId())
                     .orElseThrow(() -> new PatientNotFoundException(request.getPatientId()));
+
             isNewPatient = false;
+
         } else {
+
             if (request.getPatientDemographics() == null) {
-                throw new InvalidVisitRequestException("patientDemographics required when patientId is not provided");
+                throw new InvalidVisitRequestException(
+                        "patientDemographics required when patientId is not provided"
+                );
             }
+
             patient = createNewPatient(request.getPatientDemographics(), chew);
             patient = patientRepository.save(patient);
             isNewPatient = true;
         }
 
-        // Step 5 — Build visit (incomplete)
         VisitEntity visit = VisitEntity.builder()
                 .chew(chew)
                 .patient(patient)
@@ -63,16 +66,35 @@ public class SubmitVisitService {
                 .chiefComplaint(request.getChiefComplaint())
                 .locationName(request.getLocationName())
                 .build();
+        Integer systolicBp = null;
+        Integer heartRate = null;
+        Double temperature = null;
+        Integer spo2 = null;
 
-        // Step 6 — Run triage logic
-        RiskLevel riskLevel = triageService.computeRiskLevel(request.getSymptomFlags(), request.getVitals());
+        if (request.getVitals() != null) {
+            VitalsDto v = request.getVitals();
+
+            systolicBp = v.getBloodPressureSystolic() != null
+                    ? v.getBloodPressureSystolic().intValue()
+                    : null;
+
+            heartRate = v.getPulse();
+            temperature = v.getTemperature();
+
+            spo2 = v.getOxygenSaturation() != null
+                    ? v.getOxygenSaturation().intValue()
+                    : null;
+        }
+
+        RiskLevel riskLevel = triageService.computeRiskLevel(
+                systolicBp,
+                heartRate,
+                temperature,
+                spo2,
+                request.getChiefComplaint()
+        );
+
         visit.setRiskLevel(riskLevel);
-
-        // Step 7 — Generate AI summary (via LlmAiSummaryService)
-        Integer heartRate = request.getVitals() != null ? request.getVitals().getPulse() : null;
-        Double temperature = request.getVitals() != null ? request.getVitals().getTemperature() : null;
-        Integer spo2 = request.getVitals() != null && request.getVitals().getOxygenSaturation() != null
-                ? request.getVitals().getOxygenSaturation().intValue() : null;
 
         String aiSummary = aiSummaryService.generateClinicalSummary(
                 request.getChiefComplaint(),
@@ -80,22 +102,18 @@ public class SubmitVisitService {
                 temperature,
                 spo2
         );
-        visit.setAiSummary(aiSummary);
 
-        // Step 8 — Persist visit
+        visit.setAiSummary(aiSummary);
         visit = visitRepository.save(visit);
 
-        // Step 9 — Save vitals (if provided)
         if (request.getVitals() != null) {
             VitalsEntity vitals = mapToVitalsEntity(request.getVitals(), visit);
             vitalsRepository.save(vitals);
         }
 
-        // Step 10 — Update CHEW points
         int pointsEarned = calculatePoints(isNewPatient);
-        updateChewPoints(request.getChewId(), pointsEarned, isNewPatient);
+        updateChewPoints(chew.getId(), pointsEarned, isNewPatient);
 
-        // Step 11 — Build response DTO
         return SubmitVisitResponse.builder()
                 .patientId(patient.getId())
                 .qrToken(patient.getQrToken())
@@ -120,7 +138,11 @@ public class SubmitVisitService {
     }
 
     private String generateQrToken() {
-        return "QR-" + UUID.randomUUID().toString().replace("-", "").substring(0, 16).toUpperCase();
+        return "QR-" + UUID.randomUUID()
+                .toString()
+                .replace("-", "")
+                .substring(0, 16)
+                .toUpperCase();
     }
 
     private VitalsEntity mapToVitalsEntity(VitalsDto dto, VisitEntity visit) {
@@ -139,15 +161,19 @@ public class SubmitVisitService {
         return POINTS_PER_VISIT + (isNewPatient ? BONUS_POINTS_NEW_PATIENT : 0);
     }
 
-    private void updateChewPoints(String chewId, int pointsToAdd, boolean newPatientCaptured) {
-        ChewPointsEntity points = chewPointsRepository.findByChewId(chewId)
-                .orElse(ChewPointsEntity.builder()
-                        .chewId(chewId)
-                        .totalPoints(0)
-                        .totalPatientsCaptured(0)
-                        .build());
+    private void updateChewPoints(Long chewUserId, int pointsToAdd, boolean newPatientCaptured) {
+
+        ChewPointsEntity points = chewPointsRepository.findByChewId(chewUserId)
+                .orElse(
+                        ChewPointsEntity.builder()
+                                .chewId(chewUserId)
+                                .totalPoints(0)
+                                .totalPatientsCaptured(0)
+                                .build()
+                );
 
         points.setTotalPoints(points.getTotalPoints() + pointsToAdd);
+
         if (newPatientCaptured) {
             points.setTotalPatientsCaptured(points.getTotalPatientsCaptured() + 1);
         }

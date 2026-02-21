@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class TriagleService {
+public class TriageService {
     public RiskLevel computeRiskLevel(Integer systolicBp,
                                   Integer heartRate,
                                   Double temperature,

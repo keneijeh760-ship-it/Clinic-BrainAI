@@ -10,7 +10,7 @@ import java.util.Optional;
 
 public interface ChewPointsRepository extends JpaRepository<ChewPointsEntity, Long> {
 
-    Optional<ChewPointsEntity> findByChewId(String chewId);
+    Optional<ChewPointsEntity> findByChewId(Long chewId);
 
     List<ChewPointsEntity> findByOrderByTotalPointsDesc(Pageable pageable);
 }

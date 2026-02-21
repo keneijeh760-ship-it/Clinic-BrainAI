@@ -1,5 +1,6 @@
 package org.example.cavista.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 /**

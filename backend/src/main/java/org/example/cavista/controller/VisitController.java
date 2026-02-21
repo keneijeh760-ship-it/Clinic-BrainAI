@@ -1,6 +1,7 @@
 package org.example.cavista.controller;
 
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.example.cavista.dto.SubmitVisitRequest;
 import org.example.cavista.dto.SubmitVisitResponse;
 import org.example.cavista.service.SubmitVisitService;

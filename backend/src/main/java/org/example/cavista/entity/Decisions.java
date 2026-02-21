@@ -1,4 +1,4 @@
-package org.example.cavista.Entities;
+package org.example.cavista.entity;
 
 public enum Decisions {
     ADMIT,

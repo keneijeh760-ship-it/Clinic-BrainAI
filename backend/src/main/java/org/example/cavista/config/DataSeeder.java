@@ -18,14 +18,14 @@ public class DataSeeder {
     @Bean
     CommandLineRunner seedChew(UserRepository userRepository) {
         return args -> {
-            if (userRepository.findByChewId("CHEW-001").isEmpty()) {
+            if (userRepository.findById(1L).isEmpty()) {
                 userRepository.save(UserEntity.builder()
                         .chewId("CHEW-001")
                         .name("Demo CHEW")
                         .role(UserRole.CHEW)
                         .build());
             }
-            if (userRepository.findByChewId("DOC-001").isEmpty()) {
+            if (userRepository.findById(1L).isEmpty()) {
                 userRepository.save(UserEntity.builder()
                         .chewId("DOC-001")
                         .name("Demo Doctor")

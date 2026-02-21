@@ -1,4 +1,4 @@
-package org.example.cavista.Patient;
+package org.example.cavista.entity;
 
 public enum Sex {
     MALE,

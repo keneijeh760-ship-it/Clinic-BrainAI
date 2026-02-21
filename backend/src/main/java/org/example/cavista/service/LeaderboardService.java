@@ -1,5 +1,6 @@
 package org.example.cavista.service;
 
+import lombok.RequiredArgsConstructor;
 import org.example.cavista.dto.LeaderboardEntryDto;
 import org.example.cavista.entity.ChewPointsEntity;
 import org.example.cavista.entity.UserEntity;
@@ -31,7 +32,7 @@ public class LeaderboardService {
 
         List<LeaderboardEntryDto> result = new ArrayList<>();
         for (ChewPointsEntity points : pointsList) {
-            String chewName = userRepository.findByChewId(points.getChewId())
+            String chewName = userRepository.findById(points.getChewId())
                     .map(UserEntity::getName)
                     .orElse("Unknown");
 

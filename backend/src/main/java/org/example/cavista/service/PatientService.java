@@ -1,5 +1,6 @@
 package org.example.cavista.service;
 
+import lombok.RequiredArgsConstructor;
 import org.example.cavista.dto.*;
 import org.example.cavista.entity.*;
 import org.example.cavista.exception.PatientNotFoundException;
@@ -11,22 +12,16 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class PatientService {
 
     private final PatientRepository patientRepository;
     private final VisitRepository visitRepository;
     private final VitalsRepository vitalsRepository;
     private final OutcomeRepository outcomeRepository;
+    private final QrCodeService qrCodeService;
 
-    public PatientService(PatientRepository patientRepository,
-                          VisitRepository visitRepository,
-                          VitalsRepository vitalsRepository,
-                          OutcomeRepository outcomeRepository) {
-        this.patientRepository = patientRepository;
-        this.visitRepository = visitRepository;
-        this.vitalsRepository = vitalsRepository;
-        this.outcomeRepository = outcomeRepository;
-    }
+
 
     /**
      * Standalone patient registration. Visit flow can also create patients.
@@ -49,9 +44,12 @@ public class PatientService {
 
         patient = patientRepository.save(patient);
 
+        String qrImage = qrCodeService.generateBase64Qr(patient.getQrToken());
+
         return PatientProfileDto.builder()
                 .patientId(patient.getId())
                 .qrToken(patient.getQrToken())
+                .qrCodeBase64(qrImage)
                 .firstName(patient.getFirstName())
                 .lastName(patient.getLastName())
                 .dateOfBirth(patient.getDateOfBirth())

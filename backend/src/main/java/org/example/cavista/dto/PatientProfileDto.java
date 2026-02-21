@@ -18,4 +18,5 @@ public class PatientProfileDto {
     private String gender;
     private String phoneNumber;
     private String address;
+    private String qrCodeBase64;
 }

@@ -29,11 +29,11 @@ public class OutcomeService {
 
     @Transactional
     public OutcomeDto recordOutcome(RecordOutcomeRequest request) {
-        UserEntity doctor = userRepository.findByChewId(request.getDoctorChewId())
-                .orElseThrow(() -> new ChewNotFoundException(request.getDoctorChewId()));
+        UserEntity doctor = userRepository.findById(request.getDoctorId())
+                .orElseThrow(() -> new ChewNotFoundException(request.getDoctorId()));
 
         if (doctor.getRole() != UserRole.DOCTOR) {
-            throw new InvalidChewRoleException("User must be a doctor to record outcomes: " + request.getDoctorChewId());
+            throw new InvalidChewRoleException("User must be a doctor to record outcomes: " + request.getDoctorId());
         }
 
         VisitEntity visit = visitRepository.findById(request.getVisitId())
