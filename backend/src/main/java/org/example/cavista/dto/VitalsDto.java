@@ -16,4 +16,5 @@ public class VitalsDto {
     private Integer pulse;
     private Integer respiratoryRate;
     private Double oxygenSaturation;
+
 }
