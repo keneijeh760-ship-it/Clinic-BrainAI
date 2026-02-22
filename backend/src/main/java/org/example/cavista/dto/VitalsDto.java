@@ -10,11 +10,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class VitalsDto {
+
     private Double bloodPressureSystolic;
     private Double bloodPressureDiastolic;
     private Double temperature;
     private Integer pulse;
     private Integer respiratoryRate;
     private Double oxygenSaturation;
-
 }

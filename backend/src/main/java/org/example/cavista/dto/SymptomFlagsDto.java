@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class SymptomFlagsDto {
+
     private Boolean fever;
     private Boolean cough;
     private Boolean difficultyBreathing;

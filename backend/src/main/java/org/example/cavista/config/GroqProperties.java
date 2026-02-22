@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Configuration;
 public class GroqProperties {
 
     private String apiKey;
-    private String baseUrl;
     private String model;
-    private int timeoutMs;
+    private String baseUrl;
+    private int timeoutMs = 10000;
 }
