@@ -1,23 +1,25 @@
 package org.example.cavista.config;
 
+import lombok.RequiredArgsConstructor;
+
+import org.springframework.boot.restclient.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.client.RestTemplate;
+
+import java.time.Duration;
 
 @Configuration
-@EnableWebSecurity
-public class SecurityConfig {
+@RequiredArgsConstructor
+public class RestConfig {
+
+    private final GroqProperties groqProperties;
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/health", "/api/visits/**", "/api/patients/**", "/api/users/**", "/api/leaderboard/**", "/api/outcomes/**").permitAll()
-                        .anyRequest().authenticated()
-                )
-                .csrf(csrf -> csrf.disable());
-        return http.build();
+    public RestTemplate restTemplate(RestTemplateBuilder builder) {
+        return builder
+                .setConnectTimeout(Duration.ofMillis(groqProperties.getTimeoutMs()))
+                .setReadTimeout(Duration.ofMillis(groqProperties.getTimeoutMs()))
+                .build();
     }
 }

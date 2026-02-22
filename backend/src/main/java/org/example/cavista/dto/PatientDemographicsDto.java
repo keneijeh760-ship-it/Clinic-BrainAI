@@ -16,4 +16,5 @@ public class PatientDemographicsDto {
     private String gender;
     private String phoneNumber;
     private String address;
+
 }

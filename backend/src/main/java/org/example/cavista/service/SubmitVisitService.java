@@ -98,9 +98,8 @@ public class SubmitVisitService {
 
         String aiSummary = aiSummaryService.generateClinicalSummary(
                 request.getChiefComplaint(),
-                heartRate,
-                temperature,
-                spo2
+                request.getVitals(),
+                request.getSymptomFlags()
         );
 
         visit.setAiSummary(aiSummary);

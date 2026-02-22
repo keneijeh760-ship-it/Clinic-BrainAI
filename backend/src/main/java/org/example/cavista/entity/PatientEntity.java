@@ -27,6 +27,8 @@ public class PatientEntity {
     private String gender;
     private String phoneNumber;
     private String address;
+    @Enumerated(EnumType.STRING)
+    private PaymentOptions  paymentOptions;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by_user_id")

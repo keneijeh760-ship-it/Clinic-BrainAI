@@ -38,6 +38,17 @@ public class UserEntity implements UserDetails {
 
     private String password;
 
+    @Transient
+    private Integer visitCount;
+
+    // convenience method
+    public void incrementVisitCount() {
+        if (this.visitCount == null) {
+            this.visitCount = 0;
+        }
+        this.visitCount++;
+    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(role.name()));

@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.example.cavista.entity.PaymentOptions;
 
 @Data
 @Builder
@@ -19,4 +20,5 @@ public class PatientProfileDto {
     private String phoneNumber;
     private String address;
     private String qrCodeBase64;
+    private PaymentOptions paymentOptions;
 }

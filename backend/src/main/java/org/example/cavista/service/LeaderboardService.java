@@ -32,11 +32,19 @@ public class LeaderboardService {
 
         List<LeaderboardEntryDto> result = new ArrayList<>();
         for (ChewPointsEntity points : pointsList) {
-            String chewName = userRepository.findById(points.getChewId())
-                    .map(UserEntity::getName)
-                    .orElse("Unknown");
+            UserEntity chewUser = userRepository.findById(points.getChewId())
+                    .orElse(null);
 
+            String chewName = chewUser != null ? chewUser.getName() : "Unknown";
+
+            // ✅ visit count via repository
             int visitCount = (int) visitRepository.countByChew_ChewId(points.getChewId());
+
+            // ⭐ populate transient field (your new feature)
+            if (chewUser != null) {
+                chewUser.setVisitCount( visitCount);
+            }
+
 
             result.add(LeaderboardEntryDto.builder()
                     .chewId(points.getChewId())
@@ -48,4 +56,6 @@ public class LeaderboardService {
         }
         return result;
     }
+
+
 }
