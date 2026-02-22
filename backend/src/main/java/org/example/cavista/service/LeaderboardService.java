@@ -38,11 +38,11 @@ public class LeaderboardService {
             String chewName = chewUser != null ? chewUser.getName() : "Unknown";
 
             // ✅ visit count via repository
-            int visitCount = (int) visitRepository.countByChew_ChewId(points.getChewId());
+            long visitCount = visitRepository.countByChew_Id(points.getId());
 
             // ⭐ populate transient field (your new feature)
             if (chewUser != null) {
-                chewUser.setVisitCount( visitCount);
+                chewUser.setVisitCount((int) visitCount);
             }
 
 
@@ -51,7 +51,7 @@ public class LeaderboardService {
                     .chewName(chewName)
                     .totalPoints(points.getTotalPoints())
                     .totalPatientsCaptured(points.getTotalPatientsCaptured())
-                    .visitCount(visitCount)
+                    .visitCount((int) visitCount)
                     .build());
         }
         return result;

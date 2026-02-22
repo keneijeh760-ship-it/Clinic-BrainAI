@@ -13,5 +13,5 @@ public interface VisitRepository extends JpaRepository<VisitEntity, Long> {
 
     Optional<VisitEntity> findTopByPatientOrderByVisitTimeDesc(PatientEntity patient);
 
-    long countByChew_ChewId(Long chewId);
+    long countByChew_Id(Long id);
 }
