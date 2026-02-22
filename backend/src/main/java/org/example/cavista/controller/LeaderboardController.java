@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/auth/leaderboard")
+@RequestMapping("/api/leaderboard")
 public class LeaderboardController {
 
     private final LeaderboardService leaderboardService;

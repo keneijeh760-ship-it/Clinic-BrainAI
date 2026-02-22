@@ -9,7 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/v1/auth/outcomes")
+@RequestMapping("/api/outcomes")
 public class OutcomeController {
 
     private final OutcomeService outcomeService;
