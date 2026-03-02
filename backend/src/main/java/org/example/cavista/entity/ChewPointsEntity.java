@@ -7,8 +7,6 @@ import lombok.*;
 @Table(name = "chew_points", uniqueConstraints = {
         @UniqueConstraint(columnNames = "chew_id")
 })
-@Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder

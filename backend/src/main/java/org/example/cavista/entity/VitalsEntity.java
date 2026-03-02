@@ -13,7 +13,14 @@ import lombok.*;
 public class VitalsEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @SequenceGenerator(
+            name = "vitals_Id",
+            sequenceName = "vitals_Id",
+            allocationSize = 1
+    )
+    @GeneratedValue(
+            generator = "vitals_Id",
+            strategy = GenerationType.SEQUENCE)
     private Long id;
 
     @OneToOne(fetch = FetchType.LAZY)

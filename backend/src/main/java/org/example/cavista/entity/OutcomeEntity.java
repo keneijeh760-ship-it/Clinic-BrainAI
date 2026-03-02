@@ -15,7 +15,13 @@ import java.time.LocalDateTime;
 public class OutcomeEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @SequenceGenerator(
+            name = "outcome_id",
+            sequenceName = "outcome_id",
+            allocationSize = 1
+    )
+    @GeneratedValue(strategy = GenerationType.SEQUENCE,
+     generator = "outcome_id")
     private Long id;
 
     @OneToOne(fetch = FetchType.LAZY)

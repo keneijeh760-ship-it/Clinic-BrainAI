@@ -15,7 +15,11 @@ import java.time.LocalDateTime;
 public class VisitEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @SequenceGenerator(name = "visit_Id",
+    sequenceName = "visit_Id",
+    allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE,
+    generator = "visit_Id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)

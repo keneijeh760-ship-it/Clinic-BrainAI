@@ -2,6 +2,7 @@ package org.example.cavista.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.validator.constraints.UUID;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -19,11 +20,15 @@ import java.util.List;
 public class UserEntity implements UserDetails {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @SequenceGenerator(name = "user_Id",
+    sequenceName = "user_Id",
+    allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE,
+    generator = "user_Id")
     private Long id;
 
-    /** Staff identifier: CHEW-xxx, DOC-xxx, ADMIN-xxx */
     @Column(unique = true, nullable = false)
+    @UUID
     private String chewId;
 
     @Column(nullable = false)

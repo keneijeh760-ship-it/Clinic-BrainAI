@@ -15,7 +15,13 @@ import java.time.LocalDateTime;
 public class PatientEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @SequenceGenerator(
+            name = "patient_Id",
+            sequenceName = "patient_Id",
+            allocationSize = 1
+    )
+    @GeneratedValue(strategy = GenerationType.SEQUENCE,
+    generator = "patient_Id")
     private Long id;
 
     @Column(unique = true, nullable = false)
