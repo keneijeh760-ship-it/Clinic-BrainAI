@@ -22,17 +22,14 @@ public class LeaderboardService {
     private final UserRepository userRepository;
     private final VisitRepository visitRepository;
 
-    /**
-     * List top CHEWs by points for gamification demo.
-     * @param topN max entries (default 10 if <= 0)
-     */
+
     public List<LeaderboardEntryDto> getLeaderboard(int topN) {
         int limit = topN > 0 ? topN : 10;
         List<ChewPointsEntity> pointsList = chewPointsRepository.findByOrderByTotalPointsDesc(PageRequest.of(0, limit));
 
         List<LeaderboardEntryDto> result = new ArrayList<>();
         for (ChewPointsEntity points : pointsList) {
-            UserEntity chewUser = userRepository.findById(points.getChewId())
+            UserEntity chewUser = userRepository.findByChewId(points.getChewId())
                     .orElse(null);
 
             String chewName = chewUser != null ? chewUser.getName() : "Unknown";

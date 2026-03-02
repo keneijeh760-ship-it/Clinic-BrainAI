@@ -20,7 +20,7 @@ public class ChewPointsEntity {
     private Long id;
 
     @Column(name = "chew_id", unique = true, nullable = false)
-    private Long chewId;
+    private String chewId;
 
     private int totalPoints;
     private int totalPatientsCaptured;

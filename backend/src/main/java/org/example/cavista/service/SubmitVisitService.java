@@ -111,7 +111,7 @@ public class SubmitVisitService {
         }
 
         int pointsEarned = calculatePoints(isNewPatient);
-        updateChewPoints(chew.getId(), pointsEarned, isNewPatient);
+        updateChewPoints(String.valueOf(chew.getId()), pointsEarned, isNewPatient);
 
         return SubmitVisitResponse.builder()
                 .patientId(patient.getId())
@@ -160,7 +160,7 @@ public class SubmitVisitService {
         return POINTS_PER_VISIT + (isNewPatient ? BONUS_POINTS_NEW_PATIENT : 0);
     }
 
-    private void updateChewPoints(Long chewUserId, int pointsToAdd, boolean newPatientCaptured) {
+    private void updateChewPoints(String chewUserId, int pointsToAdd, boolean newPatientCaptured) {
 
         ChewPointsEntity points = chewPointsRepository.findByChewId(chewUserId)
                 .orElse(
