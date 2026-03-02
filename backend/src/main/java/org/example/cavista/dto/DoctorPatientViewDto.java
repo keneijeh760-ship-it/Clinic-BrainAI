@@ -7,9 +7,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
-/**
- * Doctor-friendly view when scanning patient QR.
- */
+
 @Data
 @Builder
 @NoArgsConstructor

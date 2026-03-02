@@ -23,9 +23,6 @@ public class PatientService {
 
 
 
-    /**
-     * Standalone patient registration. Visit flow can also create patients.
-     */
     @Transactional
     public PatientProfileDto registerPatient(RegisterPatientRequest request) {
         PatientDemographicsDto d = request.getDemographics();
@@ -59,9 +56,7 @@ public class PatientService {
                 .build();
     }
 
-    /**
-     * Doctor QR scan - get patient by QR token with latest visit, vitals, outcome.
-     */
+
     public DoctorPatientViewDto getPatientByQrToken(String qrToken) {
         PatientEntity patient = patientRepository.findByQrToken(qrToken)
                 .orElseThrow(() -> new PatientNotFoundException(qrToken));

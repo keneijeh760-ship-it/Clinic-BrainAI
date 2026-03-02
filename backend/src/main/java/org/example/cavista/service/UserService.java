@@ -1,5 +1,6 @@
 package org.example.cavista.service;
 
+import lombok.RequiredArgsConstructor;
 import org.example.cavista.dto.CreateUserRequest;
 import org.example.cavista.dto.UserResponse;
 import org.example.cavista.entity.UserEntity;
@@ -12,13 +13,10 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class UserService {
 
     private final UserRepository userRepository;
-
-    public UserService(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
 
     @Transactional
     public UserResponse createUser(CreateUserRequest request) {
