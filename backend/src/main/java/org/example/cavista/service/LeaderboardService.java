@@ -28,12 +28,12 @@ public class LeaderboardService {
 
     public List<LeaderboardEntryDto> getLeaderboard(int topN) {
 
-        String cacheKey = "leaderboard:: " + topN;
+        String cacheKey = "leaderboard::" + topN;
 
         List<LeaderboardEntryDto> cached =
                 (List<LeaderboardEntryDto>) redisTemplate.opsForValue().get(cacheKey);
 
-                if (cached != null){
+                if (cached != null && !cached.isEmpty()){
                     return cached;
                 }
 
@@ -45,7 +45,7 @@ public class LeaderboardService {
                 for (ChewPointsEntity points: pointsList){
                     String chewName = userRepository.findByChewId(points.getChewId())
                             .map(UserEntity::getName)
-                            .orElse("Unkown");
+                            .orElse("Unknown");
 
                     int visitCount = (int) visitRepository.countByChew_ChewId(points.getChewId());
 
@@ -53,7 +53,7 @@ public class LeaderboardService {
                             .chewId(points.getChewId())
                             .chewName(chewName)
                             .totalPoints(points.getTotalPoints())
-                            .totalPoints(points.getTotalPoints())
+                            .totalPatientsCaptured(points.getTotalPatientsCaptured())
                             .visitCount(visitCount)
                             .build());
                 }
