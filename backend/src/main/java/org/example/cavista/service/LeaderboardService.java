@@ -8,8 +8,10 @@ import org.example.cavista.repository.ChewPointsRepository;
 import org.example.cavista.repository.UserRepository;
 import org.example.cavista.repository.VisitRepository;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,37 +23,44 @@ public class LeaderboardService {
     private final ChewPointsRepository chewPointsRepository;
     private final UserRepository userRepository;
     private final VisitRepository visitRepository;
+    private final RedisTemplate<String, Object> redisTemplate;
 
 
     public List<LeaderboardEntryDto> getLeaderboard(int topN) {
-        int limit = topN > 0 ? topN : 10;
-        List<ChewPointsEntity> pointsList = chewPointsRepository.findByOrderByTotalPointsDesc(PageRequest.of(0, limit));
 
-        List<LeaderboardEntryDto> result = new ArrayList<>();
-        for (ChewPointsEntity points : pointsList) {
-            UserEntity chewUser = userRepository.findByChewId(points.getChewId())
-                    .orElse(null);
+        String cacheKey = "leaderboard:: " + topN;
 
-            String chewName = chewUser != null ? chewUser.getName() : "Unknown";
+        List<LeaderboardEntryDto> cached =
+                (List<LeaderboardEntryDto>) redisTemplate.opsForValue().get(cacheKey);
 
-            // ✅ visit count via repository
-            long visitCount = visitRepository.countByChew_ChewId(String.valueOf(points.getId()));
+                if (cached != null){
+                    return cached;
+                }
 
-            // ⭐ populate transient field (your new feature)
-            if (chewUser != null) {
-                chewUser.setVisitCount((int) visitCount);
-            }
+                int limit = topN > 0 ? topN: 10;
+                List<ChewPointsEntity> pointsList =
+                        chewPointsRepository.findByOrderByTotalPointsDesc(PageRequest.of(0, limit));
+                List<LeaderboardEntryDto> result = new ArrayList<>();
 
+                for (ChewPointsEntity points: pointsList){
+                    String chewName = userRepository.findByChewId(points.getChewId())
+                            .map(UserEntity::getName)
+                            .orElse("Unkown");
 
-            result.add(LeaderboardEntryDto.builder()
-                    .chewId(points.getChewId())
-                    .chewName(chewName)
-                    .totalPoints(points.getTotalPoints())
-                    .totalPatientsCaptured(points.getTotalPatientsCaptured())
-                    .visitCount((int) visitCount)
-                    .build());
-        }
-        return result;
+                    int visitCount = (int) visitRepository.countByChew_ChewId(points.getChewId());
+
+                    result.add(LeaderboardEntryDto.builder()
+                            .chewId(points.getChewId())
+                            .chewName(chewName)
+                            .totalPoints(points.getTotalPoints())
+                            .totalPoints(points.getTotalPoints())
+                            .visitCount(visitCount)
+                            .build());
+                }
+
+                redisTemplate.opsForValue().set(cacheKey, result, Duration.ofMinutes(5));
+
+                return result;
     }
 
 
