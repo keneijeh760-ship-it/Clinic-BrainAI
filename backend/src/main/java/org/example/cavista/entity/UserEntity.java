@@ -28,7 +28,6 @@ public class UserEntity implements UserDetails {
     private Long id;
 
     @Column(unique = true, nullable = false)
-    @UUID
     private String chewId;
 
     @Column(nullable = false)
