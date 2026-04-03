@@ -2,12 +2,14 @@ package org.example.cavista.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.example.cavista.entity.PaymentOptions;
+import org.example.cavista.entity.UserEntity;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "patients")
+@Table(name = "patients", schema = "app")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -16,27 +18,33 @@ import java.time.LocalDateTime;
 public class PatientEntity {
 
     @Id
-    @SequenceGenerator(
-            name = "patient_Id",
-            sequenceName = "patient_Id",
-            allocationSize = 1
-    )
-    @GeneratedValue(strategy = GenerationType.SEQUENCE,
-    generator = "patient_Id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true, nullable = false)
+    @Column(name = "patient_identifier", unique = true, nullable = false)
     private String qrToken;
 
+    @Column(nullable = false)
     private String firstName;
+
+    @Column(nullable = false)
     private String lastName;
+<<<<<<< HEAD:backend/src/main/java/org/example/cavista/entity/PatientEntity.java
     @Column(name = "date_of_birth")
     private LocalDate dateOfBirth;
+=======
+
+    @Column(name = "date_of_birth")
+    private LocalDate dateOfBirth;
+
+>>>>>>> 76b5e42 (data seder change):src/main/java/org/example/cavista/entity/PatientEntity.java
     private String gender;
     private String phoneNumber;
     private String address;
+
     @Enumerated(EnumType.STRING)
-    private PaymentOptions  paymentOptions;
+    @Column(name = "payment_options")
+    private PaymentOptions paymentOptions;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by_user_id")
@@ -47,6 +55,8 @@ public class PatientEntity {
 
     @PrePersist
     protected void onCreate() {
-        createdAt = LocalDateTime.now();
+        if (createdAt == null) {
+            createdAt = LocalDateTime.now();
+        }
     }
 }

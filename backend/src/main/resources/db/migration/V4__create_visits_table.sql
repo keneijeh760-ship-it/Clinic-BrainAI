@@ -1,16 +1,13 @@
+
 CREATE TABLE app.visits (
     id BIGSERIAL PRIMARY KEY,
-
     chew_user_id BIGINT NOT NULL,
     patient_id BIGINT NOT NULL,
-
     visit_time TIMESTAMP NOT NULL,
     chief_complaint VARCHAR(1000) NOT NULL,
     location_name VARCHAR(255) NOT NULL,
-
     risk_level VARCHAR(50),
     ai_summary TEXT,
-
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT fk_visit_chew

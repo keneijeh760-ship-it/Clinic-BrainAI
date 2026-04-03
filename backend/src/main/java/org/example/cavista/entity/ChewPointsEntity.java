@@ -17,7 +17,7 @@ public class ChewPointsEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "chew_id", unique = true, nullable = false)
+    @Column(name = "chew_user_id", unique = true, nullable = false)
     private String chewId;
 
     private int totalPoints;
