@@ -3,6 +3,7 @@ package org.example.cavista.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -29,7 +30,8 @@ public class PatientEntity {
 
     private String firstName;
     private String lastName;
-    private String dateOfBirth;
+    @Column(name = "date_of_birth")
+    private LocalDate dateOfBirth;
     private String gender;
     private String phoneNumber;
     private String address;

@@ -36,7 +36,7 @@ public class OutcomeEntity {
     @Column(nullable = false)
     private OutcomeDecision decision;
 
-    @Column(length = 2000)
+    @Column(length = 2000, name = "notes")
     private String note;
 
     @Column(nullable = false, updatable = false)

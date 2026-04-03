@@ -1,13 +1,14 @@
+CREATE SEQUENCE IF NOT EXISTS outcome_id START 1 INCREMENT 1;
+
 CREATE TABLE app.doctor_outcomes (
-    id BIGSERIAL PRIMARY KEY,
-
-    visit_id BIGINT NOT NULL,
-    doctor_id BIGINT NOT NULL,
-
+    id BIGINT NOT NULL DEFAULT nextval('outcome_id'),
+    visit_id BIGINT NOT NULL UNIQUE,
+    doctor_user_id BIGINT NOT NULL,
     decision VARCHAR(255) NOT NULL,
     notes TEXT,
+    recorded_at TIMESTAMP NOT NULL,
 
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT pk_doctor_outcomes PRIMARY KEY (id),
 
     CONSTRAINT fk_outcome_visit
         FOREIGN KEY (visit_id)
@@ -15,7 +16,7 @@ CREATE TABLE app.doctor_outcomes (
         ON DELETE CASCADE,
 
     CONSTRAINT fk_outcome_doctor
-        FOREIGN KEY (doctor_id)
+        FOREIGN KEY (doctor_user_id)
         REFERENCES app.users(id)
         ON DELETE CASCADE
 );
