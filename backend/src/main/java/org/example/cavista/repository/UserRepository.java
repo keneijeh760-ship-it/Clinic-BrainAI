@@ -9,6 +9,7 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
 
     Optional<UserEntity> findByChewId(String chewId);
     Optional<UserEntity> findByEmail(String email);
+    boolean existsByEmail(String email);
 }
 
 
