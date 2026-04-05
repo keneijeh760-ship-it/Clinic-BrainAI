@@ -65,6 +65,6 @@ public class AuthService {
             case ADMIN -> "ADMIN-" + System.currentTimeMillis();
             case CHEW -> "CHEW-" + System.currentTimeMillis();
             case DOCTOR -> "DOCTOR-" + System.currentTimeMillis();
-        }
+        };
     }
 }
