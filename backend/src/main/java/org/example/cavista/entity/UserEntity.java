@@ -2,7 +2,7 @@ package org.example.cavista.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.validator.constraints.UUID;
+
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -32,14 +32,14 @@ public class UserEntity implements UserDetails {
 
     @Column(nullable = false)
     private String name;
-
+    @Column(unique = true, nullable = false)
     private String email;
     private String phoneNumber;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private UserRole role;
-
+    @Column(nullable = false)
     private String password;
 
     @Transient
