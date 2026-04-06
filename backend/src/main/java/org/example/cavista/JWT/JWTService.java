@@ -37,13 +37,13 @@ public class JWTService {
                 .setClaims(claims)
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 24 * 60))
+                .setExpiration(new Date(System.currentTimeMillis() + 1000L * 24 * 60))
                 .signWith(getSignInKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
 
     public boolean validateToken(String token, UserDetails userDetails) {
-        return (userDetails.getUsername().equals(extractUsername(token)) && isTokenExpired(token));
+        return (userDetails.getUsername().equals(extractUsername(token)) && !isTokenExpired(token));
     }
 
     private boolean isTokenExpired(String token) {

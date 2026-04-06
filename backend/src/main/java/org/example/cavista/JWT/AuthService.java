@@ -28,7 +28,7 @@ public class AuthService {
         UserEntity user = UserEntity.builder()
                 .email(registerRequest.getEmail())
                 .name(registerRequest. getName())
-                .phoneNumber(registerRequest.getPhoneNmaber())
+                .phoneNumber(registerRequest.getPhoneNumber())
                 .role(registerRequest.getRole())
                 .chewId(generateStaffId(registerRequest.getRole()))
                 .password(passwordEncoder.encode(registerRequest.getPassword()))
