@@ -3,8 +3,12 @@ package org.example.cavista.service;
 import lombok.RequiredArgsConstructor;
 import org.example.cavista.dto.*;
 import org.example.cavista.entity.*;
+import org.example.cavista.event.VitalsCapturedEvent;
+import org.example.cavista.event.VisitSubmittedEvent;
 import org.example.cavista.exception.*;
 import org.example.cavista.repository.*;
+import org.example.cavista.security.AuthenticatedUserResolver;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,42 +22,31 @@ public class SubmitVisitService {
     private static final int POINTS_PER_VISIT = 10;
     private static final int BONUS_POINTS_NEW_PATIENT = 15;
 
-    private final UserRepository userRepository;
     private final PatientRepository patientRepository;
     private final VisitRepository visitRepository;
     private final VitalsRepository vitalsRepository;
     private final ChewPointsRepository chewPointsRepository;
     private final TriageService triageService;
-    private final AiSummaryService aiSummaryService;
+    private final AuthenticatedUserResolver authenticatedUserResolver;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public SubmitVisitResponse submitVisit(SubmitVisitRequest request) {
-        UserEntity chew = userRepository.findById(request.getChewId())
-                .orElseThrow(() -> new UserNotFoundException(request.getChewId()));
+        UserEntity chew = authenticatedUserResolver.currentWithRole(UserRole.CHEW);
 
-        if (chew.getRole() != UserRole.CHEW) {
-            throw new InvalidChewRoleException(
-                    "User is not authorized as CHEW: " + chew.getId()
-            );
-        }
         PatientEntity patient;
         boolean isNewPatient;
 
         if (request.getPatientId() != null) {
-
             patient = patientRepository.findById(request.getPatientId())
                     .orElseThrow(() -> new PatientNotFoundException(request.getPatientId()));
-
             isNewPatient = false;
-
         } else {
-
             if (request.getPatientDemographics() == null) {
                 throw new InvalidVisitRequestException(
                         "patientDemographics required when patientId is not provided"
                 );
             }
-
             patient = createNewPatient(request.getPatientDemographics(), chew);
             patient = patientRepository.save(patient);
             isNewPatient = true;
@@ -66,6 +59,7 @@ public class SubmitVisitService {
                 .chiefComplaint(request.getChiefComplaint())
                 .locationName(request.getLocationName())
                 .build();
+
         Integer systolicBp = null;
         Integer heartRate = null;
         Double temperature = null;
@@ -73,14 +67,11 @@ public class SubmitVisitService {
 
         if (request.getVitals() != null) {
             VitalsDto v = request.getVitals();
-
             systolicBp = v.getBloodPressureSystolic() != null
                     ? v.getBloodPressureSystolic().intValue()
                     : null;
-
             heartRate = v.getPulse();
             temperature = v.getTemperature();
-
             spo2 = v.getOxygenSaturation() != null
                     ? v.getOxygenSaturation().intValue()
                     : null;
@@ -95,29 +86,40 @@ public class SubmitVisitService {
         );
 
         visit.setRiskLevel(riskLevel);
-
-        String aiSummary = aiSummaryService.generateClinicalSummary(
-                request.getChiefComplaint(),
-                request.getVitals(),
-                request.getSymptomFlags()
-        );
-
-        visit.setAiSummary(aiSummary);
         visit = visitRepository.save(visit);
 
+        Long vitalsId = null;
         if (request.getVitals() != null) {
             VitalsEntity vitals = mapToVitalsEntity(request.getVitals(), visit);
-            vitalsRepository.save(vitals);
+            vitals = vitalsRepository.save(vitals);
+            vitalsId = vitals.getId();
+            eventPublisher.publishEvent(new VitalsCapturedEvent(
+                    visit.getId(),
+                    vitalsId,
+                    patient.getId()
+            ));
         }
 
         int pointsEarned = calculatePoints(isNewPatient);
-        updateChewPoints(String.valueOf(chew.getId()), pointsEarned, isNewPatient);
+        updateChewPoints(chew.getChewId(), pointsEarned, isNewPatient);
+
+        // Publish domain event; AI summary & any analytics run asynchronously outside the request path.
+        eventPublisher.publishEvent(new VisitSubmittedEvent(
+                visit.getId(),
+                patient.getId(),
+                chew.getChewId(),
+                riskLevel,
+                vitalsId,
+                request.getChiefComplaint(),
+                request.getVitals(),
+                request.getSymptomFlags()
+        ));
 
         return SubmitVisitResponse.builder()
                 .patientId(patient.getId())
                 .qrToken(patient.getQrToken())
                 .riskLevel(riskLevel.name())
-                .aiSummary(aiSummary)
+                .aiSummary(null)
                 .visitId(visit.getId())
                 .pointsEarned(pointsEarned)
                 .build();
@@ -160,12 +162,11 @@ public class SubmitVisitService {
         return POINTS_PER_VISIT + (isNewPatient ? BONUS_POINTS_NEW_PATIENT : 0);
     }
 
-    private void updateChewPoints(String chewUserId, int pointsToAdd, boolean newPatientCaptured) {
-
-        ChewPointsEntity points = chewPointsRepository.findByChewId(chewUserId)
+    private void updateChewPoints(String chewStaffId, int pointsToAdd, boolean newPatientCaptured) {
+        ChewPointsEntity points = chewPointsRepository.findByChewId(chewStaffId)
                 .orElse(
                         ChewPointsEntity.builder()
-                                .chewId(chewUserId)
+                                .chewId(chewStaffId)
                                 .totalPoints(0)
                                 .totalPatientsCaptured(0)
                                 .build()

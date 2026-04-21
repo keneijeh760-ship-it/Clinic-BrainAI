@@ -7,15 +7,17 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Visit-submission request. The acting CHEW is resolved from the JWT principal,
+ * NOT from the request body.
+ */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class SubmitVisitRequest {
 
-    @NotBlank(message = "chewId is required")
-    private Long chewId;
-
+    /** Optional — if omitted, {@link #patientDemographics} must be supplied. */
     private Long patientId;
 
     @Valid
@@ -26,6 +28,7 @@ public class SubmitVisitRequest {
 
     private SymptomFlagsDto symptomFlags;
 
+    @Valid
     private VitalsDto vitals;
 
     @NotBlank(message = "locationName is required")

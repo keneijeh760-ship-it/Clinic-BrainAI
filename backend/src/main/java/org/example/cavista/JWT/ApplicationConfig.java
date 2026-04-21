@@ -2,6 +2,7 @@ package org.example.cavista.JWT;
 
 import lombok.RequiredArgsConstructor;
 
+import org.example.cavista.exception.UserNotFoundException;
 import org.example.cavista.repository.UserRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,7 +23,7 @@ public class ApplicationConfig {
     @Bean
     UserDetailsService userDetailsService() {
         return username -> userRepository.findByEmail(username)
-                .orElseThrow();
+                .orElseThrow(() -> new UserNotFoundException(username));
     }
 
     @Bean
@@ -31,8 +32,9 @@ public class ApplicationConfig {
     }
 
     @Bean
+    @SuppressWarnings("deprecation")
     public AuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider( );
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
         authProvider.setUserDetailsService(userDetailsService());
         authProvider.setPasswordEncoder(passwordEncoder());
         return authProvider;

@@ -1,12 +1,17 @@
 package org.example.cavista.dto;
 
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.validator.constraints.Length;
 
+/**
+ * Admin-only request body for creating DOCTOR / ADMIN / CHEW users.
+ */
 @Data
 @Builder
 @NoArgsConstructor
@@ -16,9 +21,17 @@ public class CreateUserRequest {
     @NotBlank
     private String name;
 
+    @Email
+    @NotBlank
     private String email;
+
     private String phoneNumber;
 
     @NotBlank
-    private String role; // CHEW, DOCTOR, ADMIN
+    @Length(min = 8, message = "Password must be at least 8 characters")
+    private String password;
+
+    @NotBlank
+    @Pattern(regexp = "CHEW|DOCTOR|ADMIN", message = "Role must be one of CHEW, DOCTOR, ADMIN")
+    private String role;
 }

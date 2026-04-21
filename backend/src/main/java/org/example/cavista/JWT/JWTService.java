@@ -5,6 +5,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -16,10 +17,20 @@ import java.util.function.Function;
 
 @Service
 public class JWTService {
-    private static final String SECRET_KEY = "25ba5ad9a25f203589f467c28ad3a5965c90dd4f381e7596080d94ba16763130";
 
-    public String extractUsername(String token){
-        return extractClaims(token, Claims:: getSubject);
+    private final String secretKey;
+    private final long jwtExpirationMs;
+
+    public JWTService(
+            @Value("${app.security.jwt.secret}") String secretKey,
+            @Value("${app.security.jwt.expiration-ms:86400000}") long jwtExpirationMs
+    ) {
+        this.secretKey = secretKey;
+        this.jwtExpirationMs = jwtExpirationMs;
+    }
+
+    public String extractUsername(String token) {
+        return extractClaims(token, Claims::getSubject);
     }
 
     public <T> T extractClaims(String token, Function<Claims, T> function) {
@@ -37,7 +48,7 @@ public class JWTService {
                 .setClaims(claims)
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000L * 24 * 60))
+                .setExpiration(new Date(System.currentTimeMillis() + jwtExpirationMs))
                 .signWith(getSignInKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
@@ -47,10 +58,10 @@ public class JWTService {
     }
 
     private boolean isTokenExpired(String token) {
-        return ExtractExpiration(token).before(new Date());
+        return extractExpiration(token).before(new Date());
     }
 
-    private Date ExtractExpiration(String token) {
+    private Date extractExpiration(String token) {
         return extractClaims(token, Claims::getExpiration);
     }
 
@@ -59,11 +70,12 @@ public class JWTService {
                 .parserBuilder()
                 .setSigningKey(getSignInKey())
                 .build()
-                .parseClaimsJws(token).getBody();
+                .parseClaimsJws(token)
+                .getBody();
     }
 
     private Key getSignInKey() {
-        byte [] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
+        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         return Keys.hmacShaKeyFor(keyBytes);
     }
 }

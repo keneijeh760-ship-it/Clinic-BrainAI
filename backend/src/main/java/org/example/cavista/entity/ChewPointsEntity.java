@@ -5,7 +5,7 @@ import lombok.*;
 
 @Entity
 @Table(name = "chew_points", uniqueConstraints = {
-        @UniqueConstraint(columnNames = "chew_id")
+        @UniqueConstraint(columnNames = "chew_user_id")
 })
 @NoArgsConstructor
 @AllArgsConstructor

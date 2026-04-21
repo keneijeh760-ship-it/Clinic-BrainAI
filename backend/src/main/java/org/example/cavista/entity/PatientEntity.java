@@ -29,15 +29,10 @@ public class PatientEntity {
 
     @Column(nullable = false)
     private String lastName;
-<<<<<<< HEAD:backend/src/main/java/org/example/cavista/entity/PatientEntity.java
-    @Column(name = "date_of_birth")
-    private LocalDate dateOfBirth;
-=======
 
     @Column(name = "date_of_birth")
     private LocalDate dateOfBirth;
 
->>>>>>> 76b5e42 (data seder change):src/main/java/org/example/cavista/entity/PatientEntity.java
     private String gender;
     private String phoneNumber;
     private String address;

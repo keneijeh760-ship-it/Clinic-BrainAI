@@ -1,0 +1,13 @@
+node_modules
+dist
+.git
+.idea
+*.iml
+public
+src
+eslint.config.js
+index.html
+package.json
+package-lock.json
+tsconfig*.json
+vite.config.ts

@@ -1,0 +1,30 @@
+﻿
+> cavista@0.0.0 build
+> tsc -b && vite build
+
+vite v7.3.1 building client environment for production...
+transforming...
+Γ£ô 9 modules transformed.
+node.exe : Γ£ù Build failed in 236ms
+At line:1 char:1
++ & "C:\Program Files\nodejs/node.exe" "C:\Users\Kene\AppData\Roaming\n ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Γ£ù Build failed in 236ms:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+error during build:
+[@tailwindcss/vite:generate:build] `@utility card-hover:hover` defines an invalid utility name. Utilities should be 
+alphanumeric and start with a lowercase letter.
+file: C:/Users/Kene/Clinic-BrainAI-1/src/index.css
+    at file:///C:/Users/Kene/Clinic-BrainAI-1/node_modules/tailwindcss/dist/chunk-F4544Y4M.mjs:32:3856
+    at Cr (file:///C:/Users/Kene/Clinic-BrainAI-1/node_modules/tailwindcss/dist/chunk-F4544Y4M.mjs:3:1733)
+    at _ (file:///C:/Users/Kene/Clinic-BrainAI-1/node_modules/tailwindcss/dist/chunk-F4544Y4M.mjs:3:1377)
+    at Zi (file:///C:/Users/Kene/Clinic-BrainAI-1/node_modules/tailwindcss/dist/chunk-F4544Y4M.mjs:32:2712)
+    at async ua (file:///C:/Users/Kene/Clinic-BrainAI-1/node_modules/tailwindcss/dist/chunk-F4544Y4M.mjs:38:631)
+    at async yf (file:///C:/Users/Kene/Clinic-BrainAI-1/node_modules/tailwindcss/dist/chunk-F4544Y4M.mjs:38:1406)
+    at async uu (file:///C:/Users/Kene/Clinic-BrainAI-1/node_modules/@tailwindcss/node/dist/index.mjs:10:3457)
+    at async B.generate (file:///C:/Users/Kene/Clinic-BrainAI-1/node_modules/@tailwindcss/vite/dist/index.mjs:1:5236)
+    at async Object.handler 
+(file:///C:/Users/Kene/Clinic-BrainAI-1/node_modules/@tailwindcss/vite/dist/index.mjs:1:3957)
+    at async transform 
+(file:///C:/Users/Kene/Clinic-BrainAI-1/node_modules/rollup/dist/es/shared/node-entry.js:21246:16)

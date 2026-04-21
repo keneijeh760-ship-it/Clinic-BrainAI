@@ -11,7 +11,8 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 /**
- * Seeds a demo CHEW user for development/testing.
+ * Seeds demo users (CHEW, DOCTOR, ADMIN) for development/testing.
+ * Skipped in the `test` profile so integration tests start with a clean database.
  */
 @Configuration
 @RequiredArgsConstructor
@@ -21,9 +22,9 @@ public class DataSeeder {
     private final PasswordEncoder passwordEncoder;
 
     @Bean
-    CommandLineRunner seedChew(UserRepository userRepository) {
+    CommandLineRunner seedUsers(UserRepository userRepository) {
         return args -> {
-            if (userRepository.findById(1L).isEmpty()) {
+            if (userRepository.findByEmail("demo.chew@example.com").isEmpty()) {
                 userRepository.save(UserEntity.builder()
                         .chewId("CHEW-001")
                         .name("Demo CHEW")
@@ -33,13 +34,23 @@ public class DataSeeder {
                         .password(passwordEncoder.encode("password"))
                         .build());
             }
-            if (userRepository.findById(1L).isEmpty()) {
+            if (userRepository.findByEmail("demo.doctor@example.com").isEmpty()) {
                 userRepository.save(UserEntity.builder()
-                        .chewId("CHEW-001")
-                        .name("Demo CHEW")
-                        .email("demo.chew@example.com")
-                        .phoneNumber("08000000000")
-                        .role(UserRole.CHEW)
+                        .chewId("DOC-001")
+                        .name("Demo Doctor")
+                        .email("demo.doctor@example.com")
+                        .phoneNumber("08000000001")
+                        .role(UserRole.DOCTOR)
+                        .password(passwordEncoder.encode("password"))
+                        .build());
+            }
+            if (userRepository.findByEmail("demo.admin@example.com").isEmpty()) {
+                userRepository.save(UserEntity.builder()
+                        .chewId("ADMIN-001")
+                        .name("Demo Admin")
+                        .email("demo.admin@example.com")
+                        .phoneNumber("08000000002")
+                        .role(UserRole.ADMIN)
                         .password(passwordEncoder.encode("password"))
                         .build());
             }

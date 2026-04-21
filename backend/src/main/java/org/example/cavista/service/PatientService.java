@@ -5,6 +5,8 @@ import org.example.cavista.dto.*;
 import org.example.cavista.entity.*;
 import org.example.cavista.exception.PatientNotFoundException;
 import org.example.cavista.repository.*;
+import org.example.cavista.security.AuthenticatedUserResolver;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,11 +22,12 @@ public class PatientService {
     private final VitalsRepository vitalsRepository;
     private final OutcomeRepository outcomeRepository;
     private final QrCodeService qrCodeService;
-
-
+    private final AuthenticatedUserResolver authenticatedUserResolver;
 
     @Transactional
     public PatientProfileDto registerPatient(RegisterPatientRequest request) {
+        UserEntity chew = authenticatedUserResolver.currentWithRole(UserRole.CHEW);
+
         PatientDemographicsDto d = request.getDemographics();
         String qrToken = generateQrToken();
 
@@ -36,7 +39,7 @@ public class PatientService {
                 .gender(d.getGender())
                 .phoneNumber(d.getPhoneNumber())
                 .address(d.getAddress())
-                .createdBy(null)
+                .createdBy(chew)
                 .build();
 
         patient = patientRepository.save(patient);
@@ -56,7 +59,7 @@ public class PatientService {
                 .build();
     }
 
-
+    @Cacheable(value = "patientProfile", key = "#qrToken")
     public DoctorPatientViewDto getPatientByQrToken(String qrToken) {
         PatientEntity patient = patientRepository.findByQrToken(qrToken)
                 .orElseThrow(() -> new PatientNotFoundException(qrToken));

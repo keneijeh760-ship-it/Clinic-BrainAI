@@ -42,44 +42,73 @@ HealthConnect Nigeria (NHIS) is a lightweight, mobile-first clinical flow that h
   - AI summary
   - local trend analysis + preventive guidance (frontend-only)
 
-## Key Frontend Paths
+## Frontend (red/white NHIS theme)
+
+The frontend is a fresh Vite + React + TypeScript + Tailwind v4 app styled in
+the "bold Nigerian" red/white palette with a green accent. It uses:
+
+- **shadcn-style primitives** on top of Radix UI for forms, dialogs, tabs, etc.
+- **framer-motion** for page transitions, the animated top-nav underline, and
+  the landing hero.
+- **react-router-dom v6** with `RequireAuth` + `RequireRole` route guards.
+- **TanStack Query + axios** with a bearer-token interceptor that auto-logs
+  out on 401.
+- **html5-qrcode** for uploading QR images in the doctor lookup flow, and
+  **qrcode.react** for rendering the patient QR.
+
+### Key paths
 
 - App entry: [src/main.tsx](src/main.tsx)
 - Routing: [src/App.tsx](src/App.tsx)
+- Theme tokens: [src/index.css](src/index.css)
+- Shared layout: [src/components/layout](src/components/layout)
+- Brand logo: [src/components/brand/Logo.tsx](src/components/brand/Logo.tsx)
+- Shared UI: [src/components/ui](src/components/ui) and [src/components/common](src/components/common)
+- API client + endpoints + types: [src/lib/api](src/lib/api)
+- Auth provider + JWT decode + guards: [src/lib/auth](src/lib/auth)
+- QR helpers: [src/lib/qr](src/lib/qr)
 
 ### Pages
+
+- Public
+  - Landing: [src/pages/public/Landing.tsx](src/pages/public/Landing.tsx)
+  - Login: [src/pages/public/Login.tsx](src/pages/public/Login.tsx)
+  - Register (CHEW-only): [src/pages/public/Register.tsx](src/pages/public/Register.tsx)
 - CHEW
-  - Dashboard: [src/pages/CHEWDashboard.tsx](src/pages/CHEWDashboard.tsx)
-  - New patient capture: [src/pages/NewPatient.tsx](src/pages/NewPatient.tsx)
-  - Patient result + QR: [src/pages/PatientResult.tsx](src/pages/PatientResult.tsx)
+  - Dashboard: [src/pages/chew/ChewDashboard.tsx](src/pages/chew/ChewDashboard.tsx)
+  - New patient: [src/pages/chew/NewPatient.tsx](src/pages/chew/NewPatient.tsx)
+  - New visit: [src/pages/chew/NewVisit.tsx](src/pages/chew/NewVisit.tsx)
+  - Result + QR: [src/pages/chew/PatientResult.tsx](src/pages/chew/PatientResult.tsx)
 - Doctor
-  - Dashboard: [src/pages/DoctorDashboard.tsx](src/pages/DoctorDashboard.tsx)
-  - Manual QR entry: [src/pages/DoctorScan.tsx](src/pages/DoctorScan.tsx)
-  - QR patient record view: [src/pages/DoctorPatientView.tsx](src/pages/DoctorPatientView.tsx)
+  - Dashboard: [src/pages/doctor/DoctorDashboard.tsx](src/pages/doctor/DoctorDashboard.tsx)
+  - Lookup (upload QR or paste token): [src/pages/doctor/DoctorLookup.tsx](src/pages/doctor/DoctorLookup.tsx)
+  - Patient view + outcome: [src/pages/doctor/DoctorPatientView.tsx](src/pages/doctor/DoctorPatientView.tsx)
+- Admin
+  - Dashboard: [src/pages/admin/AdminDashboard.tsx](src/pages/admin/AdminDashboard.tsx)
+  - Users list: [src/pages/admin/UsersList.tsx](src/pages/admin/UsersList.tsx)
+  - Create user: [src/pages/admin/CreateUser.tsx](src/pages/admin/CreateUser.tsx)
+  - Tools (find by ID / QR): [src/pages/admin/AdminTools.tsx](src/pages/admin/AdminTools.tsx)
 - Shared
-  - Leaderboard: [src/pages/Leaderboard.tsx](src/pages/Leaderboard.tsx)
+  - Leaderboard: [src/pages/shared/Leaderboard.tsx](src/pages/shared/Leaderboard.tsx)
 
-### API Layer
-- Fetch client + endpoints: [src/lib/api/index.ts](src/lib/api/index.ts)
-- DTO types (kept aligned with Spring DTOs): [src/lib/api/types.ts](src/lib/api/types.ts)
-- React hooks wrapper: [src/hooks/useApi.ts](src/hooks/useApi.ts)
+### Backend API consumed today
 
-### Local “Offline-First” Storage
-For hackathon reliability (even when the backend is slow/unavailable), we store captures locally:
-- Cache helpers: [src/lib/patientCache.ts](src/lib/patientCache.ts)
-- Starter/demo captures: [src/lib/starterData.ts](src/lib/starterData.ts)
+Base path: `/api/v1` (proxied from `http://localhost:5173/api` to
+`http://localhost:8080` in dev by [vite.config.ts](vite.config.ts)).
 
-## Backend API (expected)
+- `POST /auth/register` - always creates a CHEW account
+- `POST /auth/login`
+- `GET  /health`
+- `POST /patients/register` - CHEW
+- `POST /visits/submit` - CHEW
+- `GET  /patients/qr/{qrToken}` - DOCTOR, ADMIN
+- `POST /outcomes` - DOCTOR
+- `POST /users` - ADMIN
+- `GET  /users/{id}` - ADMIN, DOCTOR, CHEW
+- `GET  /leaderboard?size=10` - authenticated
 
-Base path: `/api`
-
-- `GET /health`
-- `POST /users`
-- `POST /patients/register`
-- `POST /visits/submit`
-- `GET /patients/qr/{qrToken}`
-- `POST /outcomes`
-- `GET /leaderboard?top=10`
+Anything the UI shows as "pending backend" is intentionally waiting on the
+endpoints listed in [BACKEND_TODO.md](BACKEND_TODO.md).
 
 ## Run Locally
 
@@ -89,8 +118,8 @@ npm install
 npm run dev
 ```
 
-Optional: point the frontend to a different API base URL in local dev:
-- `VITE_API_BASE_URL=http://localhost:8080/api`
+Copy [.env.example](.env.example) to `.env` if you want to override the
+default API base URL (`/api/v1`).
 
 ### Backend (for local testing)
 From `backend/`:

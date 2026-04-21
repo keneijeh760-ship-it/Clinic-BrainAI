@@ -1,45 +1,43 @@
 package org.example.cavista.service;
 
+import lombok.RequiredArgsConstructor;
 import org.example.cavista.dto.OutcomeDto;
 import org.example.cavista.dto.RecordOutcomeRequest;
 import org.example.cavista.entity.*;
-import org.example.cavista.exception.ChewNotFoundException;
-import org.example.cavista.exception.InvalidChewRoleException;
+import org.example.cavista.event.DoctorOutcomeRecordedEvent;
 import org.example.cavista.exception.VisitNotFoundException;
 import org.example.cavista.repository.OutcomeRepository;
-import org.example.cavista.repository.UserRepository;
 import org.example.cavista.repository.VisitRepository;
+import org.example.cavista.security.AuthenticatedUserResolver;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@RequiredArgsConstructor
 public class OutcomeService {
 
     private final OutcomeRepository outcomeRepository;
     private final VisitRepository visitRepository;
-    private final UserRepository userRepository;
-
-    public OutcomeService(OutcomeRepository outcomeRepository,
-                          VisitRepository visitRepository,
-                          UserRepository userRepository) {
-        this.outcomeRepository = outcomeRepository;
-        this.visitRepository = visitRepository;
-        this.userRepository = userRepository;
-    }
+    private final AuthenticatedUserResolver authenticatedUserResolver;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public OutcomeDto recordOutcome(RecordOutcomeRequest request) {
-        UserEntity doctor = userRepository.findById(request.getDoctorId())
-                .orElseThrow(() -> new ChewNotFoundException(request.getDoctorId()));
-
-        if (doctor.getRole() != UserRole.DOCTOR) {
-            throw new InvalidChewRoleException("User must be a doctor to record outcomes: " + request.getDoctorId());
-        }
+        UserEntity doctor = authenticatedUserResolver.currentWithRole(UserRole.DOCTOR);
 
         VisitEntity visit = visitRepository.findById(request.getVisitId())
                 .orElseThrow(() -> new VisitNotFoundException(request.getVisitId()));
 
-        OutcomeDecision decision = OutcomeDecision.valueOf(request.getDecision().toUpperCase());
+        OutcomeDecision decision;
+        try {
+            decision = OutcomeDecision.valueOf(request.getDecision().toUpperCase());
+        } catch (IllegalArgumentException ex) {
+            throw new IllegalArgumentException(
+                    "Invalid decision: " + request.getDecision()
+                            + ". Expected one of: ADMIT, REFER, DISCHARGE"
+            );
+        }
 
         OutcomeEntity outcome = OutcomeEntity.builder()
                 .visit(visit)
@@ -49,6 +47,15 @@ public class OutcomeService {
                 .build();
 
         outcome = outcomeRepository.save(outcome);
+
+        String patientQr = visit.getPatient().getQrToken();
+        eventPublisher.publishEvent(new DoctorOutcomeRecordedEvent(
+                outcome.getId(),
+                visit.getId(),
+                doctor.getChewId(),
+                decision,
+                patientQr
+        ));
 
         return OutcomeDto.builder()
                 .id(outcome.getId())
