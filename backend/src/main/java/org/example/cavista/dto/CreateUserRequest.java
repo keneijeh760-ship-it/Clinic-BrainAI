@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.example.cavista.entity.UserRole;
 import org.hibernate.validator.constraints.Length;
 
 /**
@@ -33,5 +34,5 @@ public class CreateUserRequest {
 
     @NotBlank
     @Pattern(regexp = "CHEW|DOCTOR|ADMIN", message = "Role must be one of CHEW, DOCTOR, ADMIN")
-    private String role;
+    private UserRole role;
 }
