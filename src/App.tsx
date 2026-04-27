@@ -8,6 +8,7 @@ import { AppShell } from '@/components/layout/AppShell'
 import Landing from '@/pages/public/Landing'
 import Login from '@/pages/public/Login'
 import Register from '@/pages/public/Register'
+import RegisterPatient from '@/pages/public/RegisterPatient'
 import NotFound from '@/pages/shared/NotFound'
 import Unauthorized from '@/pages/shared/Unauthorized'
 import Leaderboard from '@/pages/shared/Leaderboard'
@@ -26,6 +27,15 @@ import UsersList from '@/pages/admin/UsersList'
 import CreateUser from '@/pages/admin/CreateUser'
 import AdminTools from '@/pages/admin/AdminTools'
 
+import PatientDashboard from '@/pages/patient/PatientDashboard'
+import PatientProfile from '@/pages/patient/PatientProfile'
+import PatientVisits from '@/pages/patient/PatientVisits'
+import PatientVisitDetail from '@/pages/patient/PatientVisitDetail'
+import PatientQr from '@/pages/patient/PatientQr'
+import PatientRequestVisit from '@/pages/patient/PatientRequestVisit'
+import PatientRequests from '@/pages/patient/PatientRequests'
+import PatientExport from '@/pages/patient/PatientExport'
+
 function PublicOnly({ element }: { element: React.ReactElement }) {
   const { isAuthenticated, role } = useAuth()
   if (isAuthenticated) return <Navigate to={homePathFor(role)} replace />
@@ -39,6 +49,10 @@ export default function App() {
       <Route path="/" element={<Landing />} />
       <Route path="/login" element={<PublicOnly element={<Login />} />} />
       <Route path="/register" element={<PublicOnly element={<Register />} />} />
+      <Route
+        path="/register/patient"
+        element={<PublicOnly element={<RegisterPatient />} />}
+      />
       <Route path="/unauthorized" element={<Unauthorized />} />
 
       {/* Authenticated shell */}
@@ -67,6 +81,18 @@ export default function App() {
             <Route path="/admin/users" element={<UsersList />} />
             <Route path="/admin/create-user" element={<CreateUser />} />
             <Route path="/admin/tools" element={<AdminTools />} />
+          </Route>
+
+          {/* PATIENT */}
+          <Route element={<RequireRole allow={['PATIENT']} />}>
+            <Route path="/patient" element={<PatientDashboard />} />
+            <Route path="/patient/profile" element={<PatientProfile />} />
+            <Route path="/patient/visits" element={<PatientVisits />} />
+            <Route path="/patient/visits/:visitId" element={<PatientVisitDetail />} />
+            <Route path="/patient/qr" element={<PatientQr />} />
+            <Route path="/patient/request" element={<PatientRequestVisit />} />
+            <Route path="/patient/requests" element={<PatientRequests />} />
+            <Route path="/patient/export" element={<PatientExport />} />
           </Route>
         </Route>
       </Route>

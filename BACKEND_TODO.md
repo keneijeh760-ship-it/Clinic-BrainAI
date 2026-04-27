@@ -195,7 +195,183 @@ http.authorizeHttpRequests(auth -> auth
 );
 ```
 
-## 11. Nice-to-have enhancements
+## 11. Patient Self-Serve Portal (PATIENT role)
+
+A full patient-facing portal ships on the frontend today under `/patient/*` and
+`/register/patient`. Every page degrades gracefully to a `PendingBackendCard`
+when these endpoints are missing, so the UI is fully usable the moment each
+backend item lands.
+
+### 11.1 Identity model
+
+- Add a new value to the `Role` enum: `PATIENT` (alongside `CHEW`, `DOCTOR`,
+  `ADMIN`).
+- Patients sign up directly (no admin needed) and the `UserEntity` is created
+  immediately. A clinical `PatientEntity` is **not** created at signup.
+- On the CHEW side, `PatientEntity` is created lazily on the first visit. When
+  a visit is submitted or a patient is registered by a CHEW, the backend must
+  try to **auto-link** the new `PatientEntity` to an existing `UserEntity` with
+  `role = PATIENT` whose `email` or `phoneNumber` matches. If a match exists,
+  set `PatientEntity.userId`. Otherwise leave null and do nothing.
+- Optional follow-up endpoint (not needed for MVP):
+  `POST /api/v1/patients/{id}/link-user` with body `{ userId }` - CHEW/ADMIN
+  override to link a clinical record to a user account manually.
+
+### 11.2 Schema migrations
+
+```sql
+-- Extend the role enum
+ALTER TYPE user_role ADD VALUE IF NOT EXISTS 'PATIENT';
+
+-- Link a user account to a clinical record (nullable, unique).
+ALTER TABLE patients
+  ADD COLUMN user_id BIGINT NULL UNIQUE REFERENCES users(id);
+
+-- Visit requests (self-serve "I need a visit" inbox)
+CREATE TABLE visit_requests (
+  id BIGSERIAL PRIMARY KEY,
+  user_id BIGINT NOT NULL REFERENCES users(id),
+  preferred_location VARCHAR(200) NOT NULL,
+  urgency VARCHAR(20) NOT NULL CHECK (urgency IN ('ROUTINE', 'URGENT')),
+  description TEXT NOT NULL,
+  phone_number VARCHAR(32),
+  status VARCHAR(20) NOT NULL DEFAULT 'PENDING'
+    CHECK (status IN ('PENDING', 'ACCEPTED', 'DECLINED', 'CONVERTED')),
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  converted_visit_id BIGINT NULL REFERENCES visits(id)
+);
+CREATE INDEX idx_visit_requests_user ON visit_requests(user_id, created_at DESC);
+CREATE INDEX idx_visit_requests_status ON visit_requests(status, urgency);
+```
+
+### 11.3 SecurityConfig
+
+- `POST /api/v1/auth/register/patient` - **public** (permitAll).
+- `/api/v1/me/**` - requires `ROLE_PATIENT`. Every handler must scope data by
+  the authenticated principal's user id; never accept a patient id in the URL.
+- Existing CHEW/doctor endpoints keep their current authorization. The new
+  `patients.user_id` column is server-side only; no response needs to leak it.
+
+### 11.4 Endpoints (all must be implemented)
+
+| Method & path | Role | Request body | Response | Notes |
+| --- | --- | --- | --- | --- |
+| `POST /api/v1/auth/register/patient` | Public | `PatientSignupRequest` | `AuthenticationResponse` | Creates `UserEntity` with `role=PATIENT`. Do **not** create a `PatientEntity`. Hash password with BCrypt. Enforce unique email. |
+| `GET  /api/v1/me/profile` | PATIENT | - | `MyProfileDto` | Returns the current user + their `PatientEntity` if linked, else `patient: null`. |
+| `PATCH /api/v1/me/profile` | PATIENT | `UpdateMyProfileRequest` | `MyProfileDto` | Updates the `UserEntity`'s preferred demographics. If a `PatientEntity` is linked, write-through to the clinical record too. |
+| `GET  /api/v1/me/visits?page=&size=` | PATIENT | - | `Page<MyVisitSummaryDto>` | Filter by `visit.patientId` where `patient.userId == currentUserId`. Return an empty page if not linked. |
+| `GET  /api/v1/me/visits/{visitId}` | PATIENT | - | `MyVisitDetailDto` | Must 403 (or 404) if the visit does not belong to the current user. |
+| `GET  /api/v1/me/qr` | PATIENT | - | `MyQrDto` | 404 if no `PatientEntity`. Include `qrCodeBase64` if cheap to generate. |
+| `POST /api/v1/me/visit-requests` | PATIENT | `CreateVisitRequestRequest` | `VisitRequestDto` | Persists a `PENDING` row. No PatientEntity required. |
+| `GET  /api/v1/me/visit-requests` | PATIENT | - | `List<VisitRequestDto>` | Newest first. |
+| `GET  /api/v1/me/export` | PATIENT | - | `{ exportedAt, profile, visits, outcomes }` | Optional. The frontend falls back to assembling JSON from cached queries if this 404s. |
+
+### 11.5 DTO shapes (mirror the frontend `types.ts`)
+
+```java
+// PatientSignupRequest
+record PatientSignupRequest(
+    @Email @NotBlank String email,
+    @Size(min = 8) String password,
+    @NotBlank String firstName,
+    @NotBlank String lastName,
+    String phoneNumber,
+    LocalDate dateOfBirth,
+    Sex gender,          // reuse existing enum
+    String address
+) {}
+
+// UpdateMyProfileRequest (all optional, PATCH semantics)
+record UpdateMyProfileRequest(
+    String firstName, String lastName, String phoneNumber,
+    LocalDate dateOfBirth, Sex gender, String address
+) {}
+
+// MyProfileDto
+record MyProfileDto(UserResponse user, PatientProfileDto patient) {} // patient may be null
+
+// MyVisitSummaryDto (list view)
+record MyVisitSummaryDto(
+    Long visitId, String qrToken, Instant visitTime, String locationName,
+    String chiefComplaint, RiskLevel riskLevel, boolean hasOutcome,
+    OutcomeDecision outcomeDecision
+) {}
+
+// MyVisitDetailDto (detail view)
+record MyVisitDetailDto(
+    Long visitId, Long patientId, String qrToken, Instant visitTime,
+    String locationName, String chiefComplaint, RiskLevel riskLevel,
+    String aiSummary, VitalsDto vitals, SymptomFlagsDto symptomFlags,
+    OutcomeDto outcome, CapturedBy capturedBy
+) {
+  record CapturedBy(Long id, String name) {}
+}
+
+// MyQrDto
+record MyQrDto(String qrToken, String qrCodeBase64) {}
+
+// VisitRequest
+record CreateVisitRequestRequest(
+    @NotBlank String preferredLocation,
+    @NotNull VisitRequestUrgency urgency,
+    @Size(min = 10, max = 1500) String description,
+    String phoneNumber,
+    @AssertTrue boolean consent
+) {}
+
+record VisitRequestDto(
+    Long id, String preferredLocation, VisitRequestUrgency urgency,
+    String description, String phoneNumber, VisitRequestStatus status,
+    Instant createdAt, Long convertedVisitId
+) {}
+
+enum VisitRequestUrgency { ROUTINE, URGENT }
+enum VisitRequestStatus  { PENDING, ACCEPTED, DECLINED, CONVERTED }
+```
+
+### 11.6 CHEW-side linking rule (modify existing endpoints)
+
+On `POST /api/v1/visits/submit` and `POST /api/v1/patients/register`, after
+persisting the `PatientEntity`:
+
+1. If `demographics.email` (if added) or `demographics.phoneNumber` matches a
+   `UserEntity` with `role=PATIENT`, set `patient.userId = user.id`.
+2. If there is no match, do nothing. The patient can still self-register later;
+   an admin can manually link if needed.
+
+No response shape change is required for the CHEW flow - just the side-effect.
+
+### 11.7 Frontend consumers
+
+Every `/patient/*` page lives in `src/pages/patient/` and every query goes
+through `src/pages/patient/hooks.ts`. Direct map from endpoint to consumer:
+
+| Endpoint | Consumers |
+| --- | --- |
+| `POST /auth/register/patient` | `src/pages/public/RegisterPatient.tsx` |
+| `GET /me/profile` | `PatientDashboard.tsx`, `PatientProfile.tsx`, `PatientQr.tsx`, `PatientExport.tsx` |
+| `PATCH /me/profile` | `PatientProfile.tsx` |
+| `GET /me/visits` | `PatientDashboard.tsx`, `PatientVisits.tsx`, `PatientExport.tsx` |
+| `GET /me/visits/{id}` | `PatientVisitDetail.tsx` |
+| `GET /me/qr` | `PatientQr.tsx` |
+| `POST /me/visit-requests` | `PatientRequestVisit.tsx` |
+| `GET /me/visit-requests` | `PatientDashboard.tsx`, `PatientRequests.tsx` |
+| `GET /me/export` | `PatientExport.tsx` (optional; client fallback built in) |
+
+The frontend already treats HTTP 404/501 from any of the `/me/*` endpoints as
+"not yet implemented" and renders a `PendingBackendCard`, so partial rollout
+of these endpoints is safe.
+
+### 11.8 Out of scope for MVP (future work)
+
+- Email/phone verification (OTP) on patient signup.
+- Admin UI for reviewing pending `visit_requests` and accepting them
+  (converts a request into a scheduled visit and stamps `converted_visit_id`).
+- SSE/WebSocket push so patients see outcome updates without refresh.
+
+---
+
+## 12. Nice-to-have enhancements
 
 - Return `createdAt` in `PatientProfileDto` and `UserResponse` for sort & display.
 - Return `qrCodeBase64` on `submitVisit` AND `registerPatient` consistently (already done for `registerPatient`; double check the visit path).
@@ -215,8 +391,16 @@ entry above:
 
 - `src/pages/chew/ChewDashboard.tsx` (items 2, 3)
 - `src/pages/doctor/DoctorDashboard.tsx` (items 4, 5)
-- `src/pages/admin/AdminDashboard.tsx` (items 7)
+- `src/pages/admin/AdminDashboard.tsx` (item 7)
 - `src/pages/admin/UsersList.tsx` (item 6)
+- `src/pages/patient/PatientDashboard.tsx` (item 11)
+- `src/pages/patient/PatientProfile.tsx` (item 11)
+- `src/pages/patient/PatientVisits.tsx` (item 11)
+- `src/pages/patient/PatientVisitDetail.tsx` (item 11)
+- `src/pages/patient/PatientQr.tsx` (item 11)
+- `src/pages/patient/PatientRequestVisit.tsx` (item 11)
+- `src/pages/patient/PatientRequests.tsx` (item 11)
+- `src/pages/patient/PatientExport.tsx` (item 11)
 
 And `src/lib/api/endpoints.ts` already has typed placeholders ready - just
 add new exported functions that call the new paths and plug them into the

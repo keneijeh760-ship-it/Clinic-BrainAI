@@ -30,8 +30,10 @@ import {
 import { Badge } from '@/components/ui/badge'
 import { createUser } from '@/lib/api/endpoints'
 import { extractErrorMessage } from '@/lib/api/client'
-import type { UserRole, UserResponse } from '@/lib/api/types'
+import type { UserResponse } from '@/lib/api/types'
 import { useState } from 'react'
+
+type StaffRole = 'CHEW' | 'DOCTOR' | 'ADMIN'
 
 const schema = z.object({
   name: z.string().trim().min(2, 'Name is required'),
@@ -63,7 +65,9 @@ export default function CreateUser() {
     onSuccess: (user) => {
       toast.success(`${user.role} account created for ${user.name}`)
       setCreated(user)
-      form.reset({ name: '', email: '', phoneNumber: '', password: '', role: user.role })
+      const nextRole: StaffRole =
+        user.role === 'DOCTOR' || user.role === 'ADMIN' ? user.role : 'CHEW'
+      form.reset({ name: '', email: '', phoneNumber: '', password: '', role: nextRole })
     },
     onError: (err) => toast.error(extractErrorMessage(err, 'Could not create user')),
   })
@@ -188,7 +192,7 @@ export default function CreateUser() {
                 <Select
                   value={form.watch('role')}
                   onValueChange={(v) =>
-                    form.setValue('role', v as UserRole, { shouldDirty: true })
+                    form.setValue('role', v as StaffRole, { shouldDirty: true })
                   }
                 >
                   <SelectTrigger>

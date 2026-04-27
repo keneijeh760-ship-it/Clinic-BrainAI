@@ -149,13 +149,21 @@ export default function Login() {
           </form>
 
           <p className="mt-6 text-sm text-[color:var(--color-muted-foreground)]">
-            New CHEW?{' '}
+            New here?{' '}
             <Link
               to="/register"
               className="font-semibold text-brand-600 hover:underline"
             >
-              Create an account
+              Create a CHEW account
+            </Link>{' '}
+            or{' '}
+            <Link
+              to="/register/patient"
+              className="font-semibold text-flag-green-600 hover:underline"
+            >
+              sign up as a patient
             </Link>
+            .
           </p>
           <p className="mt-2 text-xs text-[color:var(--color-muted-foreground)]">
             Doctors and admins are provisioned by an existing administrator.

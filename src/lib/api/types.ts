@@ -1,6 +1,6 @@
 // Mirrors of backend DTOs and enums. Keep these aligned with the Spring DTOs.
 
-export type UserRole = 'CHEW' | 'DOCTOR' | 'ADMIN'
+export type UserRole = 'CHEW' | 'DOCTOR' | 'ADMIN' | 'PATIENT'
 export type RiskLevel = 'GREEN' | 'YELLOW' | 'RED'
 export type PaymentOptions = 'NHIS' | 'HMO' | 'SELF_PAY' | 'COMM_FUND' | 'UNKNOWN'
 export type OutcomeDecision = 'ADMIT' | 'REFER' | 'DISCHARGE'
@@ -163,4 +163,95 @@ export interface ApiError {
   instance?: string
   errors?: Record<string, string>
   message?: string
+}
+
+// ----- Patient portal ---------------------------------------------------
+// Frontend-side shapes for the self-serve patient portal. Mirror these on
+// the backend as the endpoints in BACKEND_TODO.md are implemented.
+
+export interface PatientSignupRequest {
+  email: string
+  password: string
+  firstName: string
+  lastName: string
+  phoneNumber?: string
+  dateOfBirth?: string
+  gender?: Sex
+  address?: string
+}
+
+export interface MyProfileDto {
+  user: UserResponse
+  patient: PatientProfileDto | null
+}
+
+export interface MyVisitSummaryDto {
+  visitId: number
+  qrToken?: string
+  visitTime: string
+  locationName?: string
+  chiefComplaint: string
+  riskLevel?: RiskLevel | string
+  hasOutcome: boolean
+  outcomeDecision?: OutcomeDecision | string
+}
+
+export interface MyVisitDetailDto {
+  visitId: number
+  patientId: number
+  qrToken?: string
+  visitTime: string
+  locationName?: string
+  chiefComplaint: string
+  riskLevel?: RiskLevel | string
+  aiSummary?: string
+  vitals?: VitalsDto
+  symptomFlags?: SymptomFlagsDto
+  outcome?: OutcomeDto | null
+  capturedBy?: { id: number; name: string } | null
+}
+
+export interface MyQrDto {
+  qrToken: string
+  qrCodeBase64?: string
+}
+
+export type VisitRequestUrgency = 'ROUTINE' | 'URGENT'
+export type VisitRequestStatus = 'PENDING' | 'ACCEPTED' | 'DECLINED' | 'CONVERTED'
+
+export interface CreateVisitRequestRequest {
+  preferredLocation: string
+  urgency: VisitRequestUrgency
+  description: string
+  phoneNumber?: string
+  consent: boolean
+}
+
+export interface VisitRequestDto {
+  id: number
+  preferredLocation: string
+  urgency: VisitRequestUrgency
+  description: string
+  phoneNumber?: string
+  status: VisitRequestStatus
+  createdAt: string
+  convertedVisitId?: number | null
+}
+
+export interface UpdateMyProfileRequest {
+  firstName?: string
+  lastName?: string
+  phoneNumber?: string
+  dateOfBirth?: string
+  gender?: Sex
+  address?: string
+}
+
+// Minimal page wrapper used by paginated endpoints.
+export interface PageResponse<T> {
+  content: T[]
+  page: number
+  size: number
+  totalElements: number
+  totalPages: number
 }

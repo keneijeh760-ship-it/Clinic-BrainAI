@@ -125,3 +125,23 @@
     scroll-behavior: auto !important;
   }
 }
+
+/* Print styles: isolate the Health QR card so printing from /patient/qr yields a clean page. */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #nhis-print-card,
+  #nhis-print-card * {
+    visibility: visible;
+  }
+  #nhis-print-card {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    border-width: 2px;
+    border-color: var(--color-brand-500);
+    box-shadow: none !important;
+  }
+}

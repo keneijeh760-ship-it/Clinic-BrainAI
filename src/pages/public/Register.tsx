@@ -24,6 +24,7 @@ import { useAuth } from '@/lib/auth/AuthProvider'
 import { homePathFor } from '@/lib/auth/jwt'
 import { extractErrorMessage } from '@/lib/api/client'
 import { AuthHeroPanel } from './AuthHeroPanel'
+import { RoleSwitch } from './RoleSwitch'
 
 const schema = z.object({
   name: z.string().trim().min(2, 'Name is required'),
@@ -76,7 +77,10 @@ export default function Register() {
           <div className="lg:hidden mb-8">
             <Logo />
           </div>
-          <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
+
+          <RoleSwitch active="chew" />
+
+          <h1 className="mt-5 text-2xl font-bold tracking-tight sm:text-3xl">
             Create your CHEW account
           </h1>
           <p className="mt-2 text-sm text-[color:var(--color-muted-foreground)]">

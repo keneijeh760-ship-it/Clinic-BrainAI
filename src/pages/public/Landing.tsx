@@ -17,19 +17,35 @@ import { cn } from '@/lib/utils'
 import type { UserRole } from '@/lib/api/types'
 
 interface RoleCard {
-  role: UserRole
+  role: UserRole | 'GUEST'
   title: string
   description: string
   icon: typeof Stethoscope
+  accent: 'brand' | 'green'
+  to?: string
+  cta?: string
 }
 
 const ROLE_CARDS: RoleCard[] = [
+  {
+    role: 'PATIENT',
+    title: 'Patient',
+    description:
+      'Own your health record. See your visits, AI summary, doctor outcomes and QR - from one place.',
+    icon: HeartPulse,
+    accent: 'green',
+    to: '/register/patient',
+    cta: 'Create my health account',
+  },
   {
     role: 'CHEW',
     title: 'CHEW',
     description:
       'Register patients, capture vitals and chief complaints. Get AI-assisted triage and a QR to hand off.',
-    icon: HeartPulse,
+    icon: Stethoscope,
+    accent: 'brand',
+    to: '/register',
+    cta: 'Register as CHEW',
   },
   {
     role: 'DOCTOR',
@@ -37,6 +53,7 @@ const ROLE_CARDS: RoleCard[] = [
     description:
       'Open any patient by QR, review vitals, AI summary and history, then record the outcome in seconds.',
     icon: Stethoscope,
+    accent: 'brand',
   },
   {
     role: 'ADMIN',
@@ -44,6 +61,7 @@ const ROLE_CARDS: RoleCard[] = [
     description:
       'Provision CHEW, Doctor and Admin accounts, review leaderboards and monitor system health.',
     icon: ShieldCheck,
+    accent: 'brand',
   },
 ]
 
@@ -150,7 +168,7 @@ export default function Landing() {
               NHIS links community health workers, doctors and admins in a single,
               AI-assisted flow - from first complaint to final outcome.
             </p>
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
               {isAuthenticated ? (
                 <Button
                   size="lg"
@@ -165,9 +183,18 @@ export default function Landing() {
                   <Button
                     size="lg"
                     className="bg-white text-brand-700 hover:bg-white/90"
+                    onClick={() => navigate('/register/patient')}
+                  >
+                    <HeartPulse className="h-4 w-4" />
+                    Create my health account
+                  </Button>
+                  <Button
+                    size="lg"
+                    variant="ghost"
+                    className="text-white hover:bg-white/10 border border-white/30"
                     onClick={() => navigate('/register')}
                   >
-                    Get started as a CHEW
+                    I'm a CHEW
                     <ArrowRight className="h-4 w-4" />
                   </Button>
                   <Button
@@ -194,7 +221,7 @@ export default function Landing() {
           transition={{ duration: 0.25 }}
           className="text-xl font-bold tracking-tight text-foreground-default sm:text-2xl"
         >
-          Built for the three people who move patients through the system.
+          Built for everyone who touches a patient record.
         </motion.h2>
         <motion.div
           variants={{
@@ -204,31 +231,34 @@ export default function Landing() {
           initial="hidden"
           whileInView="show"
           viewport={{ once: true }}
-          className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
+          className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4"
         >
-          {ROLE_CARDS.map((card, idx) => {
+          {ROLE_CARDS.map((card) => {
             const Icon = card.icon
-            return (
+            const isGreen = card.accent === 'green'
+            const Inner = (
               <motion.div
-                key={card.role}
                 variants={{
                   hidden: { opacity: 0, y: 12 },
                   show: { opacity: 1, y: 0 },
                 }}
-                className="group relative overflow-hidden rounded-2xl border border-border bg-white p-6 card-hover"
+                className={cn(
+                  'group relative h-full overflow-hidden rounded-2xl border bg-white p-6 card-hover',
+                  isGreen ? 'border-flag-green-500/30' : 'border-border'
+                )}
               >
                 <div
                   aria-hidden
                   className={cn(
                     'absolute right-0 top-0 h-28 w-28 rounded-full opacity-10 blur-2xl transition-opacity group-hover:opacity-30',
-                    idx === 2 ? 'bg-flag-green-500' : 'bg-brand-500'
+                    isGreen ? 'bg-flag-green-500' : 'bg-brand-500'
                   )}
                 />
                 <div className="relative flex items-start gap-3">
                   <span
                     className={cn(
                       'grid h-11 w-11 place-items-center rounded-xl',
-                      idx === 2
+                      isGreen
                         ? 'bg-flag-green-500/10 text-flag-green-600'
                         : 'bg-brand-50 text-brand-600'
                     )}
@@ -242,9 +272,29 @@ export default function Landing() {
                     <p className="mt-1 text-sm text-[color:var(--color-muted-foreground)]">
                       {card.description}
                     </p>
+                    {card.cta ? (
+                      <span
+                        className={cn(
+                          'mt-3 inline-flex items-center gap-1 text-xs font-semibold',
+                          isGreen ? 'text-flag-green-600' : 'text-brand-600'
+                        )}
+                      >
+                        {card.cta}
+                        <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+                      </span>
+                    ) : null}
                   </div>
                 </div>
               </motion.div>
+            )
+            return card.to ? (
+              <Link key={card.role} to={card.to} className="block h-full">
+                {Inner}
+              </Link>
+            ) : (
+              <div key={card.role} className="h-full">
+                {Inner}
+              </div>
             )
           })}
         </motion.div>
@@ -284,19 +334,23 @@ export default function Landing() {
           <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h3 className="text-xl font-bold tracking-tight sm:text-2xl">
-                Ready to capture your first visit?
+                Ready to start?
               </h3>
               <p className="mt-1 text-sm text-[color:var(--color-muted-foreground)]">
-                Public registration always creates a CHEW account. Doctors and admins
-                are provisioned by an existing administrator.
+                Patients can sign up in a minute. CHEWs register to start capturing visits.
+                Doctors and admins are provisioned by an existing administrator.
               </p>
             </div>
             <div className="flex flex-wrap gap-2">
-              <Button size="lg" onClick={() => navigate('/register')}>
+              <Button size="lg" onClick={() => navigate('/register/patient')}>
+                <HeartPulse className="h-4 w-4" />
+                I'm a patient
+              </Button>
+              <Button size="lg" variant="outline" onClick={() => navigate('/register')}>
                 Create CHEW account
                 <ArrowRight className="h-4 w-4" />
               </Button>
-              <Button size="lg" variant="outline" onClick={() => navigate('/login')}>
+              <Button size="lg" variant="ghost" onClick={() => navigate('/login')}>
                 Log in
               </Button>
             </div>

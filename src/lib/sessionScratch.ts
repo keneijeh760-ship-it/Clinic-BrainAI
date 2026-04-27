@@ -74,4 +74,6 @@ export const SCRATCH_KEYS = {
   lastPatient: 'lastPatient',
   lastVisit: 'lastVisit',
   lastDoctorLookup: 'lastDoctorLookup',
+  lastPatientVisitViewed: 'lastPatientVisitViewed',
+  lastVisitRequest: 'lastVisitRequest',
 } as const

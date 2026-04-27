@@ -44,8 +44,16 @@ const NAV_ITEMS: NavItem[] = [
   { to: '/admin/create-user', label: 'Create user', roles: ['ADMIN'] },
   { to: '/admin/tools', label: 'Tools', roles: ['ADMIN'] },
 
+  { to: '/patient', label: 'Dashboard', roles: ['PATIENT'] },
+  { to: '/patient/visits', label: 'My visits', roles: ['PATIENT'] },
+  { to: '/patient/qr', label: 'My QR', roles: ['PATIENT'] },
+  { to: '/patient/request', label: 'Request visit', roles: ['PATIENT'] },
+  { to: '/patient/export', label: 'Export record', roles: ['PATIENT'] },
+
   { to: '/leaderboard', label: 'Leaderboard', roles: ['CHEW', 'DOCTOR', 'ADMIN'] },
 ]
+
+const ROLES_WITH_LEADERBOARD: UserRole[] = ['CHEW', 'DOCTOR', 'ADMIN']
 
 function useVisibleNavItems(role?: UserRole): NavItem[] {
   if (!role) return []
@@ -62,7 +70,9 @@ function DesktopNavLink({ to, label }: NavLinkItemProps) {
   return (
     <NavLink
       to={to}
-      end={to === '/chew' || to === '/doctor' || to === '/admin'}
+      end={
+        to === '/chew' || to === '/doctor' || to === '/admin' || to === '/patient'
+      }
       className={({ isActive }) =>
         cn(
           'relative px-3 py-2 text-sm font-medium transition-colors',
@@ -93,7 +103,9 @@ function MobileNavLink({ to, label, onSelect }: NavLinkItemProps) {
     <NavLink
       to={to}
       onClick={onSelect}
-      end={to === '/chew' || to === '/doctor' || to === '/admin'}
+      end={
+        to === '/chew' || to === '/doctor' || to === '/admin' || to === '/patient'
+      }
       className={({ isActive }) =>
         cn(
           'flex items-center justify-between rounded-md px-3 py-2.5 text-sm font-medium',
@@ -135,16 +147,18 @@ export function TopNav() {
         </nav>
 
         <div className="ml-auto flex items-center gap-2">
-          <Button
-            variant="ghost"
-            size="sm"
-            className="hidden sm:inline-flex"
-            onClick={() => navigate('/leaderboard')}
-            aria-label="Leaderboard"
-          >
-            <Trophy className="h-4 w-4 text-brand-500" />
-            <span className="hidden lg:inline">Leaderboard</span>
-          </Button>
+          {role && ROLES_WITH_LEADERBOARD.includes(role) ? (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="hidden sm:inline-flex"
+              onClick={() => navigate('/leaderboard')}
+              aria-label="Leaderboard"
+            >
+              <Trophy className="h-4 w-4 text-brand-500" />
+              <span className="hidden lg:inline">Leaderboard</span>
+            </Button>
+          ) : null}
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -180,11 +194,26 @@ export function TopNav() {
                   ) : null}
                 </div>
               </DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onSelect={() => navigate('/leaderboard')}>
-                <Trophy className="h-4 w-4" />
-                Leaderboard
-              </DropdownMenuItem>
+              {role && ROLES_WITH_LEADERBOARD.includes(role) ? (
+                <>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onSelect={() => navigate('/leaderboard')}>
+                    <Trophy className="h-4 w-4" />
+                    Leaderboard
+                  </DropdownMenuItem>
+                </>
+              ) : null}
+              {role === 'PATIENT' ? (
+                <>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onSelect={() => navigate('/patient/profile')}>
+                    My profile
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onSelect={() => navigate('/patient/export')}>
+                    Export my record
+                  </DropdownMenuItem>
+                </>
+              ) : null}
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 className="text-brand-700 focus:bg-brand-50 focus:text-brand-700"

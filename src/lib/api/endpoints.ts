@@ -3,16 +3,25 @@ import type {
   AuthenticationRequest,
   AuthenticationResponse,
   CreateUserRequest,
+  CreateVisitRequestRequest,
   DoctorPatientViewDto,
   LeaderboardEntryDto,
+  MyProfileDto,
+  MyQrDto,
+  MyVisitDetailDto,
+  MyVisitSummaryDto,
   OutcomeDto,
+  PageResponse,
   PatientProfileDto,
+  PatientSignupRequest,
   RecordOutcomeRequest,
   RegisterPatientRequest,
   RegisterRequest,
   SubmitVisitRequest,
   SubmitVisitResponse,
+  UpdateMyProfileRequest,
   UserResponse,
+  VisitRequestDto,
 } from './types'
 
 // ----- Auth -------------------------------------------------------------
@@ -84,5 +93,69 @@ export async function getLeaderboard(size = 10): Promise<LeaderboardEntryDto[]> 
   const { data } = await api.get<LeaderboardEntryDto[]>('/leaderboard', {
     params: { size },
   })
+  return data
+}
+
+// ----- Patient portal ---------------------------------------------------
+// Endpoints below are consumed by the `/patient/*` UI. Several of these are
+// not yet implemented on the backend (see BACKEND_TODO.md, Patient Portal
+// section) - the UI catches 404/501 responses and renders a pending state.
+
+export async function registerPatientAccount(
+  payload: PatientSignupRequest
+): Promise<AuthenticationResponse> {
+  const { data } = await api.post<AuthenticationResponse>(
+    '/auth/register/patient',
+    payload
+  )
+  return data
+}
+
+export async function getMyProfile(): Promise<MyProfileDto> {
+  const { data } = await api.get<MyProfileDto>('/me/profile')
+  return data
+}
+
+export async function updateMyProfile(
+  payload: UpdateMyProfileRequest
+): Promise<MyProfileDto> {
+  const { data } = await api.patch<MyProfileDto>('/me/profile', payload)
+  return data
+}
+
+export async function getMyVisits(
+  page = 0,
+  size = 20
+): Promise<PageResponse<MyVisitSummaryDto>> {
+  const { data } = await api.get<PageResponse<MyVisitSummaryDto>>('/me/visits', {
+    params: { page, size },
+  })
+  return data
+}
+
+export async function getMyVisit(visitId: number): Promise<MyVisitDetailDto> {
+  const { data } = await api.get<MyVisitDetailDto>(`/me/visits/${visitId}`)
+  return data
+}
+
+export async function getMyQr(): Promise<MyQrDto> {
+  const { data } = await api.get<MyQrDto>('/me/qr')
+  return data
+}
+
+export async function createVisitRequest(
+  payload: CreateVisitRequestRequest
+): Promise<VisitRequestDto> {
+  const { data } = await api.post<VisitRequestDto>('/me/visit-requests', payload)
+  return data
+}
+
+export async function getMyVisitRequests(): Promise<VisitRequestDto[]> {
+  const { data } = await api.get<VisitRequestDto[]>('/me/visit-requests')
+  return data
+}
+
+export async function exportMyRecord(): Promise<unknown> {
+  const { data } = await api.get<unknown>('/me/export')
   return data
 }

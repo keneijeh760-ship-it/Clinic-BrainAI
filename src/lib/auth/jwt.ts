@@ -29,7 +29,12 @@ function normalizeRole(value: unknown): UserRole | undefined {
   for (const entry of flatten) {
     if (typeof entry !== 'string') continue
     const upper = entry.toUpperCase().replace(/^ROLE_/, '')
-    if (upper === 'CHEW' || upper === 'DOCTOR' || upper === 'ADMIN') {
+    if (
+      upper === 'CHEW' ||
+      upper === 'DOCTOR' ||
+      upper === 'ADMIN' ||
+      upper === 'PATIENT'
+    ) {
       return upper
     }
   }
@@ -75,6 +80,8 @@ export function homePathFor(role?: UserRole): string {
       return '/doctor'
     case 'CHEW':
       return '/chew'
+    case 'PATIENT':
+      return '/patient'
     default:
       return '/'
   }
