@@ -45,7 +45,7 @@ export default function PatientQr() {
     <PageShell>
       <PageHeader
         title="My Health QR"
-        description="Show this code at any NHIS-enabled clinic for instant check-in."
+        description="Show this code at any ClinicBrain-enabled clinic for instant check-in."
         icon={<QrCode className="h-5 w-5" />}
       />
 
@@ -121,19 +121,19 @@ export default function PatientQr() {
           </CardHeader>
           <CardContent>
             <div
-              id="nhis-print-card"
+              id="cb-print-card"
               className="relative mx-auto flex w-full max-w-sm flex-col items-center gap-3 overflow-hidden rounded-2xl border-2 border-brand-500 bg-white p-5 text-center"
             >
               <div className="flex items-center gap-2 self-stretch justify-between">
                 <div className="text-left">
                   <p className="text-[10px] font-semibold uppercase tracking-wider text-brand-700">
-                    Nigeria Healthcare Intelligence
+                    ClinicBrain
                   </p>
                   <p className="text-xs font-bold text-foreground-default">
                     Patient Health QR
                   </p>
                 </div>
-                <Badge className="bg-brand-500 hover:bg-brand-500 text-white">NHIS</Badge>
+                <Badge className="bg-brand-500 hover:bg-brand-500 text-white">ClinicBrain</Badge>
               </div>
               {qrToken ? (
                 <QrDisplay
@@ -153,7 +153,7 @@ export default function PatientQr() {
                 </p>
               </div>
               <p className="mt-2 text-[10px] text-[color:var(--color-muted-foreground)]">
-                Present this card at any NHIS-enabled clinic. Do not share your token
+                Present this card at any ClinicBrain-enabled clinic. Do not share your token
                 online.
               </p>
             </div>

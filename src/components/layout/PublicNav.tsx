@@ -20,10 +20,10 @@ export function PublicNav({ page }: Props) {
   const { isAuthenticated, role } = useAuth()
 
   return (
-    <header className="sticky top-0 z-40 border-b border-border bg-white/90 shadow-sm backdrop-blur supports-[backdrop-filter]:bg-white/85">
+    <header className="sticky top-0 z-40 border-b border-border bg-[#0d0d0d]/95 shadow-sm backdrop-blur supports-[backdrop-filter]:bg-[#0d0d0d]/90">
       <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between px-4 sm:px-6 lg:px-8">
         {/* Logo always links home */}
-        <Link to="/" aria-label="Back to NHIS home" className="shrink-0">
+        <Link to="/" aria-label="Back to ClinicBrain home" className="shrink-0">
           <Logo />
         </Link>
 

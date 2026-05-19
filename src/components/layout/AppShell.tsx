@@ -10,7 +10,7 @@ import { Footer } from './Footer'
 export function AppShell() {
   const location = useLocation()
   return (
-    <div className="flex min-h-screen flex-col bg-[#f0f2f5]">
+    <div className="flex min-h-screen flex-col bg-[#111111]">
       <TopNav />
       <AnimatePresence mode="wait">
         <div key={location.pathname} className="flex-1">

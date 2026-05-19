@@ -248,7 +248,7 @@ export default function PatientRequestVisit() {
                 }
               />
               <span>
-                I consent to NHIS sharing this request with a CHEW for the purpose of
+                I consent to ClinicBrain sharing this request with a CHEW for the purpose of
                 scheduling care.
                 {form.formState.errors.consent?.message ? (
                   <span className="mt-1 block text-xs font-medium text-brand-600">

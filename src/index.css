@@ -2,35 +2,37 @@
 @import "tw-animate-css";
 
 /* --------------------------------------------------------------------------
-   NHIS design tokens - bold Nigerian theme
+   ClinicBrain design tokens — dark theme, crimson red accent
    -------------------------------------------------------------------------- */
 @theme {
   --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI",
     Roboto, "Helvetica Neue", Arial, sans-serif;
 
-  /* Brand palette */
+  /* Brand palette — crimson red */
   --color-brand-50:  #fff1f2;
-  --color-brand-100: #ffe0e3;
-  --color-brand-200: #ffc5cb;
-  --color-brand-300: #ff9ca6;
-  --color-brand-400: #fb6b79;
-  --color-brand-500: #e11d2e;   /* primary */
-  --color-brand-600: #c4121f;
-  --color-brand-700: #b91c1c;   /* deep */
-  --color-brand-800: #8d1016;
-  --color-brand-900: #5a0a0f;
+  --color-brand-100: #ffe4e6;
+  --color-brand-200: #fecdd3;
+  --color-brand-300: #fda4af;
+  --color-brand-400: #f87171;
+  --color-brand-500: #dc2626;   /* primary crimson */
+  --color-brand-600: #b91c1c;
+  --color-brand-700: #991b1b;   /* deep */
+  --color-brand-800: #7f1d1d;
+  --color-brand-900: #450a0a;
 
-  --color-flag-green-500: #0e8a3e;
-  --color-flag-green-600: #0a7233;
+  /* Patient portal accent — warm red */
+  --color-flag-green-500: #ef4444;
+  --color-flag-green-600: #dc2626;
 
-  --color-surface:       #ffffff;
-  --color-surface-soft:  #f4f6f9;
-  --color-surface-muted: #eaecf0;
-  --color-border:        #dde1e7;
-  --color-foreground:    #0a0a0a;
-  --color-muted-foreground: #6b7280;
+  /* Dark surfaces */
+  --color-surface:       #0d0d0d;
+  --color-surface-soft:  #111111;
+  --color-surface-muted: #1e1e1e;
+  --color-border:        #2a2a2a;
+  --color-foreground:    #f5f5f5;
+  --color-muted-foreground: #9ca3af;
 
-  /* shadcn-style semantic aliases (so components written with bg-primary etc. work) */
+  /* shadcn-style semantic aliases */
   --color-background: var(--color-surface);
   --color-foreground-default: var(--color-foreground);
   --color-primary: var(--color-brand-500);
@@ -39,7 +41,7 @@
   --color-secondary-foreground: var(--color-foreground);
   --color-accent: var(--color-flag-green-500);
   --color-accent-foreground: #ffffff;
-  --color-destructive: var(--color-brand-600);
+  --color-destructive: #b91c1c;
   --color-destructive-foreground: #ffffff;
   --color-ring: var(--color-brand-500);
 
@@ -104,23 +106,23 @@
       color-mix(in oklab, var(--color-brand-700) 35%, transparent) 0%,
       transparent 50%
     ),
-    linear-gradient(135deg, var(--color-brand-600), var(--color-brand-500));
+    linear-gradient(135deg, var(--color-brand-900), var(--color-brand-700));
 }
 
 @utility card-hover {
   transition: transform 180ms ease, box-shadow 180ms ease;
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 12px 28px -12px color-mix(in oklab, var(--color-brand-700) 25%, transparent);
+    box-shadow: 0 12px 28px -12px color-mix(in oklab, var(--color-brand-500) 35%, transparent);
   }
 }
 
 @utility shadow-card {
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.07), 0 1px 2px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4), 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 @utility shadow-card-md {
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08), 0 2px 6px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5), 0 2px 8px rgba(0, 0, 0, 0.4);
 }
 
 /* Reduced motion: neutralize animations */
@@ -140,11 +142,11 @@
   body * {
     visibility: hidden;
   }
-  #nhis-print-card,
-  #nhis-print-card * {
+  #cb-print-card,
+  #cb-print-card * {
     visibility: visible;
   }
-  #nhis-print-card {
+  #cb-print-card {
     position: absolute;
     top: 0;
     left: 0;

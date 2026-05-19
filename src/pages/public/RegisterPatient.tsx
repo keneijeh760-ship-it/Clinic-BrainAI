@@ -102,7 +102,7 @@ export default function RegisterPatient() {
       const session = login(token)
       const fullName = `${variables.firstName} ${variables.lastName}`.trim()
       setDisplayName(fullName)
-      toast.success(`Welcome to NHIS, ${variables.firstName}!`)
+      toast.success(`Welcome to ClinicBrain, ${variables.firstName}!`)
       navigate(homePathFor(session?.role ?? 'PATIENT'), { replace: true })
     },
     onError: (err) => {
@@ -129,7 +129,7 @@ export default function RegisterPatient() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.25 }}
-            className="w-full max-w-xl rounded-2xl bg-white p-8 shadow-card-md"
+            className="w-full max-w-xl rounded-2xl bg-[#1a1a1a] p-8 shadow-card-md"
           >
             <RoleSwitch active="patient" />
 
@@ -340,8 +340,8 @@ export default function RegisterPatient() {
                   }
                 />
                 <span>
-                  I agree to NHIS storing my health information to enable care, and I understand
-                  clinicians may view my record during visits.
+                  I agree to ClinicBrain storing my health information to enable care, and I
+                  understand that clinicians may view my record during visits.
                   {form.formState.errors.consent?.message ? (
                     <span className="mt-1 block text-xs font-medium text-brand-600">
                       {form.formState.errors.consent.message}

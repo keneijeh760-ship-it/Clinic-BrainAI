@@ -82,7 +82,7 @@ export default function PatientRequests() {
     <PageShell>
       <PageHeader
         title="My visit requests"
-        description="Status of requests you've sent to NHIS. Updates in real time as CHEWs respond."
+        description="Status of requests you've sent to ClinicBrain. Updates in real time as CHEWs respond."
         icon={<ClipboardList className="h-5 w-5" />}
         actions={
           <>

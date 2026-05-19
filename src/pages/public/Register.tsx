@@ -53,7 +53,7 @@ export default function Register() {
     onSuccess: ({ token }, variables) => {
       const session = login(token)
       setDisplayName(variables.name)
-      toast.success(`Welcome to NHIS, ${variables.name.split(' ')[0]}!`)
+      toast.success(`Welcome to ClinicBrain, ${variables.name.split(' ')[0]}!`)
       navigate(homePathFor(session?.role ?? 'CHEW'), { replace: true })
     },
     onError: (err) => {
@@ -75,7 +75,7 @@ export default function Register() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.25 }}
-            className="w-full max-w-md rounded-2xl bg-white p-8 shadow-card-md"
+            className="w-full max-w-md rounded-2xl bg-[#1a1a1a] p-8 shadow-card-md"
           >
             <RoleSwitch active="chew" />
 

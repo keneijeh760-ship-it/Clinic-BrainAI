@@ -71,7 +71,7 @@ const FEATURES = [
     icon: Brain,
     title: 'AI clinical summary',
     description:
-      'Every visit gets a concise, Groq-powered summary highlighting what matters for the reviewing doctor.',
+      'Every visit gets an AI-generated summary that highlights what matters most for the reviewing doctor.',
   },
   {
     icon: QrCode,
@@ -123,16 +123,16 @@ export default function Landing() {
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-white opacity-75" />
                 <span className="relative inline-flex h-2 w-2 rounded-full bg-white" />
               </span>
-              Live · Cavista Hackathon · Team Mannalon
+              Now available · AI-powered clinical intelligence
             </span>
             <h1 className="mt-5 text-4xl font-extrabold leading-[1.05] tracking-tight sm:text-5xl lg:text-6xl">
-              Clinical intelligence
+              Smarter clinics,
               <br />
-              for rural Nigeria.
+              healthier communities.
             </h1>
             <p className="mt-5 max-w-2xl text-lg text-white/85 sm:text-xl">
-              NHIS links community health workers, doctors and admins in a single,
-              AI-assisted flow - from first complaint to final outcome.
+              ClinicBrain connects community health workers, doctors and admins in a
+              single AI-assisted flow — from first complaint to final outcome.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
               {isAuthenticated ? (
@@ -187,7 +187,7 @@ export default function Landing() {
           transition={{ duration: 0.25 }}
           className="text-xl font-bold tracking-tight text-foreground-default sm:text-2xl"
         >
-          Built for everyone who touches a patient record.
+          One platform for every person who touches a patient record.
         </motion.h2>
         <motion.div
           variants={{
@@ -300,10 +300,10 @@ export default function Landing() {
           <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h3 className="text-xl font-bold tracking-tight sm:text-2xl">
-                Ready to start?
+                Ready to get started?
               </h3>
               <p className="mt-1 text-sm text-[color:var(--color-muted-foreground)]">
-                Patients can sign up in a minute. CHEWs register to start capturing visits.
+                Patients sign up in under a minute. CHEWs register to start capturing visits.
                 Doctors and admins are provisioned by an existing administrator.
               </p>
             </div>
@@ -328,7 +328,7 @@ export default function Landing() {
         <div className="mx-auto flex w-full max-w-6xl flex-col items-start gap-4 px-4 py-8 sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
           <Logo />
           <p className="text-xs text-[color:var(--color-muted-foreground)]">
-            Nigeria Healthcare Intelligence System · Built by Mannalon for the Cavista Hackathon
+            ClinicBrain · AI-powered clinical intelligence platform
           </p>
         </div>
       </footer>

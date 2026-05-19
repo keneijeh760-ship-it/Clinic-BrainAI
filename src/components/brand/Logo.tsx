@@ -7,8 +7,9 @@ interface LogoProps {
 }
 
 /**
- * NHIS logo: a rounded red square holding a white EKG/pulse line, paired with
- * an "NHIS" wordmark. Uses inline SVG so we can recolor for dark hero sections.
+ * ClinicBrain logo: a rounded teal square holding a white EKG/pulse line,
+ * paired with a "ClinicBrain" wordmark. Uses inline SVG so we can recolor
+ * for dark hero sections.
  */
 export function Logo({ className, variant = 'default', withWordmark = true }: LogoProps) {
   const mark = variant === 'white' ? 'white' : 'var(--color-brand-500)'
@@ -36,11 +37,11 @@ export function Logo({ className, variant = 'default', withWordmark = true }: Lo
         <span className="flex flex-col leading-none">
           <span
             className={cn(
-              'text-lg font-extrabold tracking-tight',
+              'text-base font-extrabold tracking-tight',
               variant === 'white' ? 'text-white' : 'text-foreground-default'
             )}
           >
-            NHIS
+            ClinicBrain
           </span>
           <span
             className={cn(
@@ -50,7 +51,7 @@ export function Logo({ className, variant = 'default', withWordmark = true }: Lo
                 : 'text-[color:var(--color-muted-foreground)]'
             )}
           >
-            Health Intelligence
+            Clinical AI
           </span>
         </span>
       ) : null}

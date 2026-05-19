@@ -44,7 +44,7 @@ export function QrDisplay({
       if (!href) throw new Error('No QR image available')
       const a = document.createElement('a')
       a.href = href
-      a.download = `nhis-patient-${qrToken}.png`
+      a.download = `clinicbrain-patient-${qrToken}.png`
       document.body.appendChild(a)
       a.click()
       document.body.removeChild(a)

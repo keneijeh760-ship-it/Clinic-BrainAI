@@ -55,7 +55,7 @@ export default function PatientDashboard() {
     <PageShell>
       <PageHeader
         title={`Hello, ${firstName}`}
-        description="Your personal health hub. Your record is powered by NHIS - updated every time you visit a clinic."
+        description="Your personal health hub. Your record is powered by ClinicBrain — updated every time you visit a clinic."
         icon={<HeartPulse className="h-5 w-5" />}
         actions={
           <>

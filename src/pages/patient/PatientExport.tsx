@@ -71,7 +71,7 @@ export default function PatientExport() {
         const blob = new Blob([JSON.stringify(data, null, 2)], {
           type: 'application/json',
         })
-        triggerBlobDownload(blob, `nhis-record-${new Date().toISOString().slice(0, 10)}.json`)
+        triggerBlobDownload(blob, `clinicbrain-record-${new Date().toISOString().slice(0, 10)}.json`)
         toast.success('Record downloaded')
         return
       } catch (err) {
@@ -83,7 +83,7 @@ export default function PatientExport() {
       const blob = new Blob([JSON.stringify(aggregate(), null, 2)], {
         type: 'application/json',
       })
-      triggerBlobDownload(blob, `nhis-record-${new Date().toISOString().slice(0, 10)}.json`)
+      triggerBlobDownload(blob, `clinicbrain-record-${new Date().toISOString().slice(0, 10)}.json`)
       toast.success('Record downloaded (assembled locally)')
     } finally {
       setJsonBusy(false)
@@ -106,7 +106,7 @@ export default function PatientExport() {
       doc.setFont('helvetica', 'bold')
       doc.setTextColor(225, 29, 46) // brand-500
       doc.setFontSize(20)
-      doc.text('NHIS - Patient Health Record', margin, y)
+      doc.text('ClinicBrain - Patient Health Record', margin, y)
       y += 24
 
       doc.setTextColor(82, 82, 82)
@@ -187,13 +187,13 @@ export default function PatientExport() {
         doc.setFontSize(8)
         doc.setTextColor(82, 82, 82)
         doc.text(
-          `Page ${i} of ${pageCount} - Nigeria Healthcare Intelligence System`,
+          `Page ${i} of ${pageCount} - ClinicBrain`,
           margin,
           doc.internal.pageSize.getHeight() - 20
         )
       }
 
-      doc.save(`nhis-record-${new Date().toISOString().slice(0, 10)}.pdf`)
+      doc.save(`clinicbrain-record-${new Date().toISOString().slice(0, 10)}.pdf`)
       toast.success('PDF generated')
     } catch (err) {
       toast.error(extractErrorMessage(err, 'Could not generate PDF'))
@@ -206,7 +206,7 @@ export default function PatientExport() {
     <PageShell>
       <PageHeader
         title="Export my record"
-        description="Download your full NHIS record as JSON or a formatted PDF. Your device, your data."
+        description="Download your full ClinicBrain record as JSON or a formatted PDF. Your device, your data."
         icon={<Download className="h-5 w-5" />}
         actions={
           <Button asChild variant="ghost">

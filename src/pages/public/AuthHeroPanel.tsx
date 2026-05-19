@@ -10,7 +10,7 @@ const BULLETS = [
   { icon: Activity, text: 'Real-time leaderboard and outcome tracking.' },
 ]
 
-/** The left red brand panel shared by Login + Register. */
+/** The left teal brand panel shared by Login + Register. */
 export function AuthHeroPanel() {
   return (
     <aside className="relative hidden overflow-hidden brand-gradient text-white lg:block">
@@ -44,8 +44,8 @@ export function AuthHeroPanel() {
             Faster triage. Safer handoff. Smarter clinics.
           </h2>
           <p className="mt-4 max-w-md text-white/80">
-            NHIS connects Community Health Extension Workers, doctors and admins
-            with AI-assisted summaries and QR-based patient records.
+            ClinicBrain connects CHEWs, doctors and admins with AI-assisted
+            summaries and QR-based patient records — all in one flow.
           </p>
 
           <ul className="mt-10 space-y-3">
@@ -69,7 +69,7 @@ export function AuthHeroPanel() {
           </ul>
         </div>
         <p className="text-xs text-white/60">
-          Built by Mannalon · Nigeria Healthcare Intelligence System
+          ClinicBrain · Intelligent clinical workflows, powered by AI
         </p>
       </div>
     </aside>

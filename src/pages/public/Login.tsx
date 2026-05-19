@@ -67,13 +67,13 @@ export default function Login() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.25 }}
-            className="w-full max-w-md rounded-2xl bg-white p-8 shadow-card-md"
+            className="w-full max-w-md rounded-2xl bg-[#1a1a1a] p-8 shadow-card-md"
           >
             <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
               Welcome back
             </h1>
             <p className="mt-2 text-sm text-[color:var(--color-muted-foreground)]">
-              Log in to access your NHIS dashboard.
+              Log in to access your ClinicBrain dashboard.
             </p>
 
             <form onSubmit={onSubmit} className="mt-8 space-y-5">
