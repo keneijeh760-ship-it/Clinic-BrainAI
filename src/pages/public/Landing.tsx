@@ -15,6 +15,7 @@ import { useAuth } from '@/lib/auth/AuthProvider'
 import { homePathFor } from '@/lib/auth/jwt'
 import { cn } from '@/lib/utils'
 import type { UserRole } from '@/lib/api/types'
+import { PublicNav } from '@/components/layout/PublicNav'
 
 interface RoleCard {
   role: UserRole | 'GUEST'
@@ -92,42 +93,7 @@ export default function Landing() {
 
   return (
     <div className="flex min-h-screen flex-col bg-surface-soft">
-      {/* Header */}
-      <header className="z-10 border-b border-transparent">
-        <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-5 sm:px-6 lg:px-8">
-          <Link to="/" aria-label="NHIS home">
-            <Logo variant="white" />
-          </Link>
-          <nav className="flex items-center gap-2">
-            {isAuthenticated ? (
-              <Button
-                variant="secondary"
-                onClick={() => navigate(homePathFor(role))}
-                className="bg-white/15 text-white hover:bg-white/25 border-transparent"
-              >
-                Open dashboard
-              </Button>
-            ) : (
-              <>
-                <Button
-                  variant="ghost"
-                  className="text-white hover:bg-white/10"
-                  onClick={() => navigate('/login')}
-                >
-                  Log in
-                </Button>
-                <Button
-                  variant="default"
-                  className="bg-white text-brand-700 hover:bg-white/90"
-                  onClick={() => navigate('/register')}
-                >
-                  Register as CHEW
-                </Button>
-              </>
-            )}
-          </nav>
-        </div>
-      </header>
+      <PublicNav page="landing" />
 
       {/* Hero */}
       <section className="relative overflow-hidden brand-gradient text-white">

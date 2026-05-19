@@ -1,5 +1,6 @@
+import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { Activity, HeartPulse, ShieldCheck, Sparkles } from 'lucide-react'
+import { Activity, ArrowLeft, HeartPulse, ShieldCheck, Sparkles } from 'lucide-react'
 import { Logo } from '@/components/brand/Logo'
 
 const BULLETS = [
@@ -28,7 +29,16 @@ export function AuthHeroPanel() {
       />
 
       <div className="relative flex h-full flex-col justify-between p-12">
-        <Logo variant="white" />
+        <div className="flex flex-col gap-4">
+          <Link
+            to="/"
+            className="inline-flex w-fit items-center gap-1.5 rounded-md px-2 py-1 text-xs font-medium text-white/70 transition-colors hover:bg-white/10 hover:text-white"
+          >
+            <ArrowLeft className="h-3.5 w-3.5" />
+            Back to home
+          </Link>
+          <Logo variant="white" />
+        </div>
         <div>
           <h2 className="max-w-md text-4xl font-extrabold leading-[1.05] tracking-tight">
             Faster triage. Safer handoff. Smarter clinics.
