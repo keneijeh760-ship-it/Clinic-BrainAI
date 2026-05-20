@@ -44,4 +44,16 @@ public class VisitEntity {
 
     @Column(length = 2000)
     private String aiSummary;
+
+    // Symptom flags captured during visit
+    @Column(name = "symptom_fever") private Boolean symptomFever;
+    @Column(name = "symptom_cough") private Boolean symptomCough;
+    @Column(name = "symptom_difficulty_breathing") private Boolean symptomDifficultyBreathing;
+    @Column(name = "symptom_chest_pain") private Boolean symptomChestPain;
+    @Column(name = "symptom_severe_headache") private Boolean symptomSevereHeadache;
+    @Column(name = "symptom_confusion") private Boolean symptomConfusion;
+    @Column(name = "symptom_bleeding") private Boolean symptomBleeding;
+    @Column(name = "symptom_loss_of_consciousness") private Boolean symptomLossOfConsciousness;
+    @Column(name = "symptom_severe_dehydration") private Boolean symptomSevereDehydration;
+    @Column(name = "symptom_convulsions") private Boolean symptomConvulsions;
 }

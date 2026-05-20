@@ -45,6 +45,11 @@ public class PatientEntity {
     @JoinColumn(name = "created_by_user_id")
     private UserEntity createdBy;
 
+    /** Linked portal account — set when a patient self-registers. */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private UserEntity user;
+
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 

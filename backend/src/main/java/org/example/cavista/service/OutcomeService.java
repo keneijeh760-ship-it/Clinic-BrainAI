@@ -5,11 +5,14 @@ import org.example.cavista.dto.OutcomeDto;
 import org.example.cavista.dto.RecordOutcomeRequest;
 import org.example.cavista.entity.*;
 import org.example.cavista.event.DoctorOutcomeRecordedEvent;
+import org.example.cavista.exception.DuplicateOutcomeException;
 import org.example.cavista.exception.VisitNotFoundException;
 import org.example.cavista.repository.OutcomeRepository;
 import org.example.cavista.repository.VisitRepository;
 import org.example.cavista.security.AuthenticatedUserResolver;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,6 +31,10 @@ public class OutcomeService {
 
         VisitEntity visit = visitRepository.findById(request.getVisitId())
                 .orElseThrow(() -> new VisitNotFoundException(request.getVisitId()));
+
+        if (outcomeRepository.existsByVisit_Id(visit.getId())) {
+            throw new DuplicateOutcomeException(visit.getId());
+        }
 
         OutcomeDecision decision;
         try {
@@ -57,11 +64,21 @@ public class OutcomeService {
                 patientQr
         ));
 
+        return toDto(outcome);
+    }
+
+    public Page<OutcomeDto> getMyOutcomes(Pageable pageable) {
+        UserEntity doctor = authenticatedUserResolver.currentWithRole(UserRole.DOCTOR);
+        return outcomeRepository.findByDoctorOrderByRecordedAtDesc(doctor, pageable)
+                .map(this::toDto);
+    }
+
+    private OutcomeDto toDto(OutcomeEntity o) {
         return OutcomeDto.builder()
-                .id(outcome.getId())
-                .decision(outcome.getDecision().name())
-                .note(outcome.getNote())
-                .recordedAt(outcome.getRecordedAt())
+                .id(o.getId())
+                .decision(o.getDecision().name())
+                .note(o.getNote())
+                .recordedAt(o.getRecordedAt())
                 .build();
     }
 }

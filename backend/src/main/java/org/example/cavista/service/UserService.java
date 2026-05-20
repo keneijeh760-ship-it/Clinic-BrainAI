@@ -12,6 +12,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 import java.util.UUID;
 
 @Service
@@ -27,7 +30,7 @@ public class UserService {
             throw new DuplicateEmailException(request.getEmail());
         }
 
-        UserRole role = UserRole.valueOf(request.getRole().toUpperCase());
+        UserRole role = request.getRole();
         String staffId = generateStaffId(role);
 
         UserEntity user = UserEntity.builder()
@@ -50,11 +53,18 @@ public class UserService {
         return toResponse(user);
     }
 
+    /** Admin: paginated list of all staff (excludes PATIENT accounts). */
+    public Page<UserResponse> listStaff(Pageable pageable) {
+        return userRepository.findByRoleNotOrderByNameAsc(UserRole.PATIENT, pageable)
+                .map(this::toResponse);
+    }
+
     private String generateStaffId(UserRole role) {
         String prefix = switch (role) {
             case CHEW -> "CHEW";
             case DOCTOR -> "DOC";
             case ADMIN -> "ADMIN";
+            case PATIENT -> "PAT";
         };
         return prefix + "-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
     }

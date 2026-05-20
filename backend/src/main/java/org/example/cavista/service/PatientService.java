@@ -7,6 +7,8 @@ import org.example.cavista.exception.PatientNotFoundException;
 import org.example.cavista.repository.*;
 import org.example.cavista.security.AuthenticatedUserResolver;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -46,17 +48,7 @@ public class PatientService {
 
         String qrImage = qrCodeService.generateBase64Qr(patient.getQrToken());
 
-        return PatientProfileDto.builder()
-                .patientId(patient.getId())
-                .qrToken(patient.getQrToken())
-                .qrCodeBase64(qrImage)
-                .firstName(patient.getFirstName())
-                .lastName(patient.getLastName())
-                .dateOfBirth(patient.getDateOfBirth())
-                .gender(patient.getGender())
-                .phoneNumber(patient.getPhoneNumber())
-                .address(patient.getAddress())
-                .build();
+        return toProfileDto(patient, qrImage);
     }
 
     @Cacheable(value = "patientProfile", key = "#qrToken")
@@ -78,8 +70,7 @@ public class PatientService {
 
         if (latestVisitOpt.isPresent()) {
             VisitEntity visit = latestVisitOpt.get();
-            builder
-                    .latestVisitId(visit.getId())
+            builder.latestVisitId(visit.getId())
                     .visitTime(visit.getVisitTime())
                     .chiefComplaint(visit.getChiefComplaint())
                     .riskLevel(visit.getRiskLevel() != null ? visit.getRiskLevel().name() : null)
@@ -106,6 +97,43 @@ public class PatientService {
         }
 
         return builder.build();
+    }
+
+    /** CHEW: paginated list of patients they registered. */
+    public Page<PatientProfileDto> getMyPatients(Pageable pageable) {
+        UserEntity chew = authenticatedUserResolver.currentWithRole(UserRole.CHEW);
+        return patientRepository.findByCreatedByOrderByCreatedAtDesc(chew, pageable)
+                .map(p -> toProfileDto(p, null));
+    }
+
+    /** DOCTOR / ADMIN: search patients by name or QR token. */
+    public Page<PatientProfileDto> searchPatients(String q, Pageable pageable) {
+        return patientRepository.search(q, pageable)
+                .map(p -> toProfileDto(p, null));
+    }
+
+    /** Resolve the PatientEntity linked to the currently authenticated PATIENT user. */
+    public PatientEntity resolveCurrentPatient() {
+        UserEntity user = authenticatedUserResolver.current();
+        return patientRepository.findByUser(user)
+                .orElseThrow(() -> new PatientNotFoundException("No patient profile linked to this account"));
+    }
+
+    // ── helpers ────────────────────────────────────────────────────────────────
+
+    private PatientProfileDto toProfileDto(PatientEntity p, String qrCodeBase64) {
+        return PatientProfileDto.builder()
+                .patientId(p.getId())
+                .qrToken(p.getQrToken())
+                .qrCodeBase64(qrCodeBase64)
+                .firstName(p.getFirstName())
+                .lastName(p.getLastName())
+                .dateOfBirth(p.getDateOfBirth())
+                .gender(p.getGender())
+                .phoneNumber(p.getPhoneNumber())
+                .address(p.getAddress())
+                .paymentOptions(p.getPaymentOptions())
+                .build();
     }
 
     private String generateQrToken() {

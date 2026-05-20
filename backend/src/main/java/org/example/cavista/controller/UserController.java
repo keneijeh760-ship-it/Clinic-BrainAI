@@ -5,6 +5,9 @@ import lombok.RequiredArgsConstructor;
 import org.example.cavista.dto.CreateUserRequest;
 import org.example.cavista.dto.UserResponse;
 import org.example.cavista.service.UserService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -21,14 +24,21 @@ public class UserController {
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<UserResponse> createUser(@Valid @RequestBody CreateUserRequest request) {
-        UserResponse response = userService.createUser(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        return ResponseEntity.status(HttpStatus.CREATED).body(userService.createUser(request));
     }
 
+    /** Admin-only: get a specific user by internal ID. */
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN','DOCTOR','CHEW')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<UserResponse> getUserById(@PathVariable Long id) {
-        UserResponse response = userService.getUserById(id);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(userService.getUserById(id));
+    }
+
+    /** Admin-only: paginated list of all staff accounts (excludes patients). */
+    @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Page<UserResponse>> listStaff(
+            @PageableDefault(size = 20) Pageable pageable) {
+        return ResponseEntity.ok(userService.listStaff(pageable));
     }
 }

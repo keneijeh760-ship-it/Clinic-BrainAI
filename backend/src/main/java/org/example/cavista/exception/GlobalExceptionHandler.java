@@ -1,6 +1,7 @@
 package org.example.cavista.exception;
 
 import jakarta.validation.ConstraintViolationException;
+import org.example.cavista.exception.DuplicateOutcomeException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
@@ -56,6 +57,11 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(DuplicateEmailException.class)
     public ProblemDetail handleDuplicateEmail(DuplicateEmailException ex) {
+        return ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, ex.getMessage());
+    }
+
+    @ExceptionHandler(DuplicateOutcomeException.class)
+    public ProblemDetail handleDuplicateOutcome(DuplicateOutcomeException ex) {
         return ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, ex.getMessage());
     }
 

@@ -52,12 +52,23 @@ public class SubmitVisitService {
             isNewPatient = true;
         }
 
+        SymptomFlagsDto flags = request.getSymptomFlags();
         VisitEntity visit = VisitEntity.builder()
                 .chew(chew)
                 .patient(patient)
                 .visitTime(LocalDateTime.now())
                 .chiefComplaint(request.getChiefComplaint())
                 .locationName(request.getLocationName())
+                .symptomFever(flags != null ? flags.getFever() : null)
+                .symptomCough(flags != null ? flags.getCough() : null)
+                .symptomDifficultyBreathing(flags != null ? flags.getDifficultyBreathing() : null)
+                .symptomChestPain(flags != null ? flags.getChestPain() : null)
+                .symptomSevereHeadache(flags != null ? flags.getSevereHeadache() : null)
+                .symptomConfusion(flags != null ? flags.getConfusion() : null)
+                .symptomBleeding(flags != null ? flags.getBleeding() : null)
+                .symptomLossOfConsciousness(flags != null ? flags.getLossOfConsciousness() : null)
+                .symptomSevereDehydration(flags != null ? flags.getSevereDehydration() : null)
+                .symptomConvulsions(flags != null ? flags.getConvulsions() : null)
                 .build();
 
         Integer systolicBp = null;
