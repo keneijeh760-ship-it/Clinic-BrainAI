@@ -1,9 +1,8 @@
 # Nigeria Healthcare Intelligence System (NHIS) — Cavista Hackathon
 
 **Team:** Mannalon  
-**Frontend (this repo — maintained by @prosperisadev):** https://github.com/prosperisadev/healthconnect-nigeria  
-**Frontend author GitHub:** https://github.com/prosperisadev  
-**Backend (main backend repo):** https://github.com/keneijeh760-ship-it/Clinic-BrainAI
+
+**Backend (main repo):** https://github.com/keneijeh760-ship-it/Clinic-BrainAI
 
 HealthConnect Nigeria (NHIS) is a lightweight, mobile-first clinical flow that helps:
 - **CHEWs** capture patient vitals + complaints quickly
